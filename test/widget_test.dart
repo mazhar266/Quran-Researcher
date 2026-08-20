@@ -33,7 +33,7 @@ void main() {
       child: const QuranApp(),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('Quran Companion'), findsOneWidget);
+    expect(find.text('Quran Researcher'), findsOneWidget);
     expect(find.text('Al-Fatihah'), findsOneWidget);
     expect(find.text('Makkah · 7 ayahs'), findsOneWidget);
   });

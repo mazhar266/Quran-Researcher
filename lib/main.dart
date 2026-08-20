@@ -22,7 +22,7 @@ class QuranApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(settingsProvider.select((s) => s.theme));
     return MaterialApp.router(
-      title: 'Quran Companion',
+      title: 'Quran Researcher',
       theme: AppTheme.of(theme),
       routerConfig: router,
     );

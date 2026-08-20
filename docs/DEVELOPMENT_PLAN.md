@@ -1,4 +1,4 @@
-# Quran Companion — Development Plan
+# Quran Researcher — Development Plan
 
 A cross-platform Flutter Quran application (Web, Android, iOS, Windows, macOS, Linux) built on the QUL (Quranic Universal Library) dataset and the Arramooz Arabic dictionary.
 
@@ -26,8 +26,8 @@ quran research/
 │   ├── translation/       # EN + BN translations, word-by-word
 │   └── transliteration/   # simple, tajweed, syllable-level
 ├── docs/                  # this document
-└── (Flutter app at root — created with:
-     flutter create --project-name quran_app --org <your.org> . )
+└── (Flutter app "Quran Researcher" at root — Dart package quran_app,
+     app id research.quran.mazhar.fi on every platform)
 ```
 
 **Data quirk:** most `*.json` / `*.db` entries under `data/` are actually *directories*
@@ -202,7 +202,7 @@ column added for joining against QUL roots.
 self-validation report (18 checks: entity counts, section coverage, FTS spot
 check, dictionary root join — 1,547 of 1,642 QUL roots have Arramooz entries).
 Flutter app scaffolded for all six platforms as `quran_app`
-(org `com.example` — change before store release) with flutter_riverpod,
+(app id `research.quran.mazhar.fi`, display name "Quran Researcher") with flutter_riverpod,
 go_router, drift (+sqlite3 libs), a light/dark/sepia theme system, and a
 passing boot test. `data/` stays out of pubspec assets — it is ETL input only;
 `dist/` is gitignored (regenerable).

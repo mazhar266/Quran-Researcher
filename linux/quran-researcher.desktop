@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=Quran Researcher
+Comment=Quran reading and research app
+Exec=/home/mazhar/Projects/quran research/build/linux/x64/release/bundle/quran_app
+Icon=quran-researcher
+Terminal=false
+Type=Application
+Categories=Education;
+StartupWMClass=quran_app
+
+# To install locally:
+#   cp linux/quran-researcher.desktop ~/.local/share/applications/
+#   cp icon.png ~/.local/share/icons/hicolor/512x512/apps/quran-researcher.png
+# (Update Exec if the bundle lives elsewhere; proper packaging comes in Phase 5.)

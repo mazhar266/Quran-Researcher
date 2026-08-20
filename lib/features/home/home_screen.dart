@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Quran Companion'),
+          title: const Text('Quran Researcher'),
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
