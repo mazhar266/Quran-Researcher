@@ -1,0 +1,3 @@
+[submodule "arramooz"]
+	path = data/arramooz
+	url = git@github.com:linuxscout/arramooz.git
