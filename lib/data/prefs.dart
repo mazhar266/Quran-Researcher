@@ -23,6 +23,8 @@ class Settings {
   final bool transliteration;
   final double arabicFontSize;
   final ReadingTheme theme;
+  final String reciterId;
+  final String tafsirBookSlug;
 
   const Settings({
     this.scriptSlug = 'qpc-hafs',
@@ -31,6 +33,8 @@ class Settings {
     this.transliteration = false,
     this.arabicFontSize = 28,
     this.theme = ReadingTheme.light,
+    this.reciterId = '953',
+    this.tafsirBookSlug = 'en-tafisr-ibn-kathir',
   });
 
   String get fontFamily => readerScripts
@@ -47,6 +51,8 @@ class Settings {
     bool? transliteration,
     double? arabicFontSize,
     ReadingTheme? theme,
+    String? reciterId,
+    String? tafsirBookSlug,
   }) =>
       Settings(
         scriptSlug: scriptSlug ?? this.scriptSlug,
@@ -55,6 +61,8 @@ class Settings {
         transliteration: transliteration ?? this.transliteration,
         arabicFontSize: arabicFontSize ?? this.arabicFontSize,
         theme: theme ?? this.theme,
+        reciterId: reciterId ?? this.reciterId,
+        tafsirBookSlug: tafsirBookSlug ?? this.tafsirBookSlug,
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +72,8 @@ class Settings {
         'translit': transliteration,
         'fontSize': arabicFontSize,
         'theme': theme.name,
+        'reciter': reciterId,
+        'tafsirBook': tafsirBookSlug,
       };
 
   factory Settings.fromJson(Map<String, dynamic> j) => Settings(
@@ -75,6 +85,8 @@ class Settings {
         arabicFontSize: (j['fontSize'] as num?)?.toDouble() ?? 28,
         theme: ReadingTheme.values
             .firstWhere((t) => t.name == j['theme'], orElse: () => ReadingTheme.light),
+        reciterId: j['reciter'] as String? ?? '953',
+        tafsirBookSlug: j['tafsirBook'] as String? ?? 'en-tafisr-ibn-kathir',
       );
 }
 

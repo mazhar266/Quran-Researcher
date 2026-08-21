@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../audio/audio_controller.dart';
 import '../../data/models.dart';
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import 'player_bar.dart';
+import 'tafsir_sheet.dart';
 
 /// (surah id, settings that affect the query) -> ayah views.
 final surahAyahsProvider =
@@ -84,6 +87,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             ),
         ],
       ),
+      bottomNavigationBar: const PlayerBar(),
       body: ayahs.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Could not load surah.\n$e')),
@@ -144,14 +148,18 @@ class AyahTile extends ConsumerWidget {
     final bookmarks = ref.watch(bookmarksProvider);
     final bookmarked = bookmarks.contains(ayah.verseKey);
     final scheme = Theme.of(context).colorScheme;
-
-    final arabic = settings.scriptHasAyahMarker
-        ? ayah.arabic
-        : '${ayah.arabic} ﴿${_arabicDigits(ayah.ayah)}﴾';
+    // Only rebuild this tile for word changes within its own ayah.
+    final activeWord = ref.watch(activeWordProvider.select(
+        (w) => w != null && w.$1 == ayah.verseKey ? w.$2 : null));
+    final isPlayingAyah = ref.watch(audioControllerProvider
+        .select((p) => p.surah != null && p.currentVerseKey == ayah.verseKey));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
+        color: isPlayingAyah
+            ? scheme.primaryContainer.withValues(alpha: 0.25)
+            : null,
         border: Border(
           bottom: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4)),
         ),
@@ -173,6 +181,30 @@ class AyahTile extends ConsumerWidget {
               ],
               const Spacer(),
               IconButton(
+                icon: Icon(Icons.play_circle_outline,
+                    color: isPlayingAyah ? scheme.primary : null),
+                tooltip: 'Play from here',
+                onPressed: () async {
+                  try {
+                    await ref
+                        .read(audioControllerProvider.notifier)
+                        .playAyah(ayah.surah, ayah.ayah);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('$e'.replaceFirst('Exception: ', '')),
+                        duration: const Duration(seconds: 6),
+                      ));
+                    }
+                  }
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.menu_book_outlined),
+                tooltip: 'Tafsir',
+                onPressed: () => showTafsirSheet(context, ayah.verseKey),
+              ),
+              IconButton(
                 icon: Icon(
                   bookmarked ? Icons.bookmark : Icons.bookmark_outline,
                   color: bookmarked ? scheme.primary : null,
@@ -184,19 +216,13 @@ class AyahTile extends ConsumerWidget {
             ],
           ),
           if (settings.wordByWord && ayah.words.isNotEmpty)
-            _WordByWordWrap(ayah: ayah, settings: settings)
+            _WordByWordWrap(
+                ayah: ayah, settings: settings, activeWord: activeWord)
           else
             Align(
               alignment: Alignment.centerRight,
-              child: Text(
-                arabic,
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  fontFamily: settings.fontFamily,
-                  fontSize: settings.arabicFontSize,
-                  height: 1.9,
-                ),
-              ),
+              child: _ArabicText(
+                  ayah: ayah, settings: settings, activeWord: activeWord),
             ),
           if (ayah.transliteration != null)
             Padding(
@@ -224,11 +250,59 @@ class AyahTile extends ConsumerWidget {
       .join();
 }
 
-class _WordByWordWrap extends StatelessWidget {
-  const _WordByWordWrap({required this.ayah, required this.settings});
+/// Continuous Arabic text with the currently recited word highlighted.
+/// Tokens from splitting on spaces align with 1-based word positions.
+class _ArabicText extends StatelessWidget {
+  const _ArabicText({
+    required this.ayah,
+    required this.settings,
+    required this.activeWord,
+  });
 
   final AyahView ayah;
   final Settings settings;
+  final int? activeWord;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final style = TextStyle(
+      fontFamily: settings.fontFamily,
+      fontSize: settings.arabicFontSize,
+      height: 1.9,
+      color: scheme.onSurface,
+    );
+    final highlight = style.copyWith(
+      color: scheme.primary,
+      backgroundColor: scheme.primaryContainer.withValues(alpha: 0.6),
+    );
+    final tokens = ayah.arabic.split(' ');
+    return Text.rich(
+      TextSpan(children: [
+        for (var i = 0; i < tokens.length; i++) ...[
+          TextSpan(
+              text: tokens[i], style: activeWord == i + 1 ? highlight : style),
+          if (i != tokens.length - 1) TextSpan(text: ' ', style: style),
+        ],
+        if (!settings.scriptHasAyahMarker)
+          TextSpan(
+              text: ' ﴿${AyahTile._arabicDigits(ayah.ayah)}﴾', style: style),
+      ]),
+      textDirection: TextDirection.rtl,
+    );
+  }
+}
+
+class _WordByWordWrap extends StatelessWidget {
+  const _WordByWordWrap({
+    required this.ayah,
+    required this.settings,
+    required this.activeWord,
+  });
+
+  final AyahView ayah;
+  final Settings settings;
+  final int? activeWord;
 
   @override
   Widget build(BuildContext context) {
@@ -240,27 +314,36 @@ class _WordByWordWrap extends StatelessWidget {
         runSpacing: 10,
         children: [
           for (final w in ayah.words)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  w.arabic,
-                  style: TextStyle(
-                    fontFamily: settings.fontFamily,
-                    fontSize: settings.arabicFontSize * 0.9,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+              decoration: BoxDecoration(
+                color: activeWord == w.pos
+                    ? scheme.primaryContainer.withValues(alpha: 0.6)
+                    : null,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    w.arabic,
+                    style: TextStyle(
+                      fontFamily: settings.fontFamily,
+                      fontSize: settings.arabicFontSize * 0.9,
+                    ),
                   ),
-                ),
-                if (w.glossEn != null)
-                  Text(w.glossEn!,
-                      textDirection: TextDirection.ltr,
-                      style: TextStyle(
-                          fontSize: 11.5, color: scheme.onSurfaceVariant)),
-                if (w.glossBn != null)
-                  Text(w.glossBn!,
-                      textDirection: TextDirection.ltr,
-                      style: TextStyle(
-                          fontSize: 11.5, color: scheme.onSurfaceVariant)),
-              ],
+                  if (w.glossEn != null)
+                    Text(w.glossEn!,
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(
+                            fontSize: 11.5, color: scheme.onSurfaceVariant)),
+                  if (w.glossBn != null)
+                    Text(w.glossBn!,
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(
+                            fontSize: 11.5, color: scheme.onSurfaceVariant)),
+                ],
+              ),
             ),
         ],
       ),

@@ -25,3 +25,13 @@ final dbProvider = FutureProvider<AppDatabase>((ref) async {
   ref.onDispose(db.close);
   return db;
 });
+
+/// Lazily opened module databases (tafsir books, reciter audio), keyed by
+/// file name, e.g. 'tafsir_en-tafisr-ibn-kathir.db'. Kept open once used.
+final moduleDbProvider =
+    FutureProvider.family<AppDatabase, String>((ref, name) async {
+  final db = AppDatabase(await openModuleDb(name));
+  ref.onDispose(db.close);
+  ref.keepAlive();
+  return db;
+});

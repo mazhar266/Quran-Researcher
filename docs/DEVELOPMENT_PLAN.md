@@ -231,11 +231,34 @@ Linux. Linux note: this machine's gcc-14 lacks libstdc++-dev, so build with
 `CXXFLAGS="--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13"` (or install
 `libstdc++-14-dev`).
 
-### Phase 2 — Audio & tafsir (~3 weeks)
+### Phase 2 — Audio & tafsir ✅ DONE
 
-Both reciters with streaming + offline caching, word-level highlight following
-recitation, ayah/range repeat for memorization, background playback. Tafsir
-module downloads with an in-reader tafsir panel (all 10 books).
+**Audio**: per-ayah playback of both reciters (Al-Afasy, Al-Husary) streamed
+from the Tarteel CDN with `LockCachingAudioSource` keeping local copies for
+offline replay (native). Player bar in the reader: reciter picker,
+prev/play/next, repeat cycle off → this-ayah → range (A/B markers set from the
+current ayah — the memorization loop). Word-level highlight follows the
+recitation using the ETL's timing segments, in both continuous-text mode
+(per-word TextSpans) and word-by-word mode (chip highlight); the playing ayah
+is also tinted. Backends: just_audio + just_audio_background (Android/iOS
+lock-screen controls; manifest service + FOREGROUND_SERVICE_MEDIA_PLAYBACK,
+iOS UIBackgroundModes audio) and just_audio_media_kit with bundled libmpv on
+Linux/Windows.
+
+**Tafsir**: all 10 books readable from every ayah via a draggable bottom sheet
+with a persisted book picker; HTML rendered with flutter_widget_from_html_core;
+grouped entries follow their alias (e.g. 1:7 shows the 1:6–1:7 text with a
+"covered together" note).
+
+**Distribution note**: with no CDN yet, the 10 tafsir DBs (~122 MB) and 2
+audio DBs ship as assets, lazily copied into app storage on first use — on web
+Flutter fetches assets on demand, which is effectively download-on-demand.
+Swapping the asset source for real CDN downloads is a Phase 5 change confined
+to `openModuleDb`.
+
+Verified: analyze clean; 15 tests pass (new: segments parsing + `wordAt`,
+tafsir group aliasing, all 10 books returning text for 2:255, both reciters);
+Linux debug and web release builds succeed.
 
 ### Phase 3 — Mushaf mode & tajweed (~3 weeks)
 
