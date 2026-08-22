@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,6 +67,7 @@ class QuranRepo {
     required List<String> translationSlugs,
     required bool transliteration,
     required bool wordByWord,
+    bool tajweed = false,
   }) async {
     final ayahRows = await _db.customSelect(
       'SELECT a.ayah, a.verse_key, a.page, a.juz, a.sajda_type, t.text '
@@ -98,6 +101,20 @@ class QuranRepo {
     final translit =
         transliteration ? await _resourceTexts(surah, 'translit-simple') : null;
 
+    final tajweedRows = <int, (String, List<(int, int, String)>)>{};
+    if (tajweed) {
+      final rows = await _db.customSelect(
+        'SELECT ayah, text, spans FROM tajweed_ayah WHERE surah = ?1',
+        variables: [Variable.withInt(surah)],
+      ).get();
+      for (final r in rows) {
+        final spans = (jsonDecode(r.read<String>('spans')) as List)
+            .map((s) => (s[0] as int, s[1] as int, s[2] as String))
+            .toList();
+        tajweedRows[r.read<int>('ayah')] = (r.read<String>('text'), spans);
+      }
+    }
+
     return ayahRows.map((r) {
       final ayah = r.read<int>('ayah');
       return AyahView(
@@ -114,6 +131,8 @@ class QuranRepo {
             if (translations[slug]![ayah] != null) slug: translations[slug]![ayah]!,
         },
         transliteration: translit?[ayah],
+        tajweedText: tajweedRows[ayah]?.$1,
+        tajweedSpans: tajweedRows[ayah]?.$2,
       );
     }).toList();
   }

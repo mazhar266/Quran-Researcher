@@ -260,12 +260,31 @@ Verified: analyze clean; 15 tests pass (new: segments parsing + `wordAt`,
 tafsir group aliasing, all 10 books returning text for 2:255, both reciters);
 Linux debug and web release builds succeed.
 
-### Phase 3 — Mushaf mode & tajweed (~3 weeks)
+### Phase 3 — Mushaf mode & tajweed ✅ DONE
 
-Tajweed-colored rendering with legend and per-rule toggles. Downloadable V1/V2
-font packs for the authentic 604-page mushaf view (line-accurate if QUL layout
-DBs are added; justified page flow otherwise). Qira'at scripts (Warsh etc.)
-with their bundled faces as a script option.
+**Tajweed**: settings toggle colors all 18 QPC rule classes in the
+Uthmani/QPC-Hafs scripts using the standard palette, rendered from the ETL's
+pre-parsed spans (no HTML parsing at frame time); a legend sheet lists every
+rule with its color and a per-rule show/hide switch; coloring composes with
+the audio word highlight (spans split at word boundaries).
+
+**Mushaf page mode**: `/mushaf/:page` shows all 604 pages with the authentic
+QPC V1 per-page fonts, swiped RTL like a physical mushaf, with surah headers,
+bismillah, page/juz indicator, go-to-page, and an ayah list that jumps back to
+the reader; the reader's book icon opens the current page. Fonts ship as the
+69 MB zip asset: extracted to app storage once on native, decompressed
+per-page in memory on web; current ±1 page fonts preload. Layout is justified
+flow — line-accurate 15-line pages still await QUL's layout DBs.
+
+**Qira'at**: Warsh joins the script picker with its KFGQPC face. Because its
+ayah numbering differs from Hafs (6,214 ayahs), Warsh mode is deliberately
+Arabic-only — translations, word-by-word, and audio hide with an explanatory
+banner rather than silently misaligning.
+
+Verified: analyze clean; 22 tests pass (tajweed span builder incl. disabled
+rules and word-boundary splits, corpus-wide rule-palette coverage on surah 2,
+mushaf page queries, Warsh row counts, fontpack integrity); Linux debug and
+web release builds succeed.
 
 ### Phase 4 — Research layer (~4 weeks)
 

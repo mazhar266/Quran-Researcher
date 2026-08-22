@@ -63,6 +63,10 @@ class AyahView {
   final Map<String, String> translations;
   final String? transliteration;
 
+  /// Plain QPC-Hafs text + rule spans, present when tajweed mode is on.
+  final String? tajweedText;
+  final List<(int, int, String)>? tajweedSpans;
+
   const AyahView({
     required this.surah,
     required this.ayah,
@@ -74,6 +78,8 @@ class AyahView {
     required this.words,
     required this.translations,
     required this.transliteration,
+    this.tajweedText,
+    this.tajweedSpans,
   });
 }
 

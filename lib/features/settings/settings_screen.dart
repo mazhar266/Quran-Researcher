@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import '../../tajweed/tajweed.dart';
 import '../../theme/app_theme.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -44,6 +45,24 @@ class SettingsScreen extends ConsumerWidget {
               onChanged: (v) =>
                   notifier.update((s) => s.copyWith(arabicFontSize: v)),
             ),
+          ),
+          const _SectionHeader('Tajweed'),
+          SwitchListTile(
+            title: const Text('Tajweed colors'),
+            subtitle: const Text(
+                'Color recitation rules in the Uthmani/QPC Hafs scripts'),
+            value: settings.tajweedColors,
+            onChanged: (v) =>
+                notifier.update((s) => s.copyWith(tajweedColors: v)),
+          ),
+          ListTile(
+            enabled: settings.tajweedColors,
+            title: const Text('Rule legend & toggles'),
+            subtitle: Text(settings.tajweedDisabledRules.isEmpty
+                ? 'All ${tajweedRules.length} rules shown'
+                : '${settings.tajweedDisabledRules.length} rules hidden'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => _showTajweedLegend(context),
           ),
           const _SectionHeader('Display'),
           SwitchListTile(
@@ -93,6 +112,55 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showTajweedLegend(BuildContext context) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    builder: (context) => DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.7,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) => Consumer(
+        builder: (context, ref, _) {
+          final disabled = ref.watch(
+              settingsProvider.select((s) => s.tajweedDisabledRules.toSet()));
+          final notifier = ref.read(settingsProvider.notifier);
+          return ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text('Tajweed rules',
+                    style: Theme.of(context).textTheme.titleMedium),
+              ),
+              for (final rule in tajweedRules)
+                SwitchListTile(
+                  secondary: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: rule.color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  title: Text(rule.label),
+                  value: !disabled.contains(rule.slug),
+                  onChanged: (on) => notifier.update((s) {
+                    final set = s.tajweedDisabledRules.toSet();
+                    on ? set.remove(rule.slug) : set.add(rule.slug);
+                    return s.copyWith(tajweedDisabledRules: set.toList());
+                  }),
+                ),
+            ],
+          );
+        },
+      ),
+    ),
+  );
 }
 
 class _SectionHeader extends StatelessWidget {

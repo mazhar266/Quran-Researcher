@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/models.dart';
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import '../research/research_tab.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final lastRead = ref.watch(lastReadProvider);
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Quran Researcher'),
@@ -29,10 +30,11 @@ class HomeScreen extends ConsumerWidget {
               onPressed: () => context.push('/settings'),
             ),
           ],
-          bottom: const TabBar(tabs: [
+          bottom: const TabBar(isScrollable: true, tabs: [
             Tab(text: 'Surahs'),
             Tab(text: 'Juz'),
             Tab(text: 'Bookmarks'),
+            Tab(text: 'Research'),
           ]),
         ),
         floatingActionButton: lastRead == null
@@ -46,7 +48,7 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
         body: const TabBarView(
-          children: [_SurahTab(), _JuzTab(), _BookmarksTab()],
+          children: [_SurahTab(), _JuzTab(), _BookmarksTab(), ResearchTab()],
         ),
       ),
     );

@@ -9,11 +9,13 @@ import '../theme/app_theme.dart';
 final sharedPrefsProvider =
     Provider<SharedPreferences>((ref) => throw UnimplementedError());
 
-/// Reader scripts selectable in Phase 1 (slug -> font family, label).
+/// Reader scripts (slug -> font family, label). Warsh is a different riwayah
+/// with its own ayah numbering, so the reader shows it Arabic-only.
 const readerScripts = [
   (slug: 'uthmani', family: 'UthmanicHafs', label: 'Uthmani'),
   (slug: 'qpc-hafs', family: 'UthmanicHafs', label: 'Uthmani (QPC Hafs)'),
   (slug: 'indopak-nastaleeq', family: 'IndoPakNastaleeq', label: 'IndoPak Nastaleeq'),
+  (slug: 'warsh', family: 'UthmanicWarsh', label: "Warsh (qira'at)"),
 ];
 
 class Settings {
@@ -25,6 +27,8 @@ class Settings {
   final ReadingTheme theme;
   final String reciterId;
   final String tafsirBookSlug;
+  final bool tajweedColors;
+  final List<String> tajweedDisabledRules;
 
   const Settings({
     this.scriptSlug = 'qpc-hafs',
@@ -35,6 +39,8 @@ class Settings {
     this.theme = ReadingTheme.light,
     this.reciterId = '953',
     this.tafsirBookSlug = 'en-tafisr-ibn-kathir',
+    this.tajweedColors = false,
+    this.tajweedDisabledRules = const [],
   });
 
   String get fontFamily => readerScripts
@@ -43,6 +49,11 @@ class Settings {
 
   /// qpc-hafs already ends each ayah with its Arabic number glyph.
   bool get scriptHasAyahMarker => scriptSlug == 'qpc-hafs';
+
+  bool get isWarsh => scriptSlug == 'warsh';
+
+  /// Tajweed markup is QPC-Hafs based, so coloring applies to Hafs scripts.
+  bool get tajweedApplies => tajweedColors && fontFamily == 'UthmanicHafs';
 
   Settings copyWith({
     String? scriptSlug,
@@ -53,6 +64,8 @@ class Settings {
     ReadingTheme? theme,
     String? reciterId,
     String? tafsirBookSlug,
+    bool? tajweedColors,
+    List<String>? tajweedDisabledRules,
   }) =>
       Settings(
         scriptSlug: scriptSlug ?? this.scriptSlug,
@@ -63,6 +76,8 @@ class Settings {
         theme: theme ?? this.theme,
         reciterId: reciterId ?? this.reciterId,
         tafsirBookSlug: tafsirBookSlug ?? this.tafsirBookSlug,
+        tajweedColors: tajweedColors ?? this.tajweedColors,
+        tajweedDisabledRules: tajweedDisabledRules ?? this.tajweedDisabledRules,
       );
 
   Map<String, dynamic> toJson() => {
@@ -74,6 +89,8 @@ class Settings {
         'theme': theme.name,
         'reciter': reciterId,
         'tafsirBook': tafsirBookSlug,
+        'tajweed': tajweedColors,
+        'tajweedOff': tajweedDisabledRules,
       };
 
   factory Settings.fromJson(Map<String, dynamic> j) => Settings(
@@ -87,6 +104,9 @@ class Settings {
             .firstWhere((t) => t.name == j['theme'], orElse: () => ReadingTheme.light),
         reciterId: j['reciter'] as String? ?? '953',
         tafsirBookSlug: j['tafsirBook'] as String? ?? 'en-tafisr-ibn-kathir',
+        tajweedColors: j['tajweed'] as bool? ?? false,
+        tajweedDisabledRules:
+            (j['tajweedOff'] as List?)?.cast<String>() ?? const [],
       );
 }
 

@@ -52,23 +52,34 @@ def key_parts(verse_key):
     return int(s), int(a)
 
 
-RULE_RE = re.compile(r"<rule class=([a-z_0-9]+)>(.*?)</rule>", re.S)
+# The QPC source mixes unquoted and quoted attributes (<rule class=x> and
+# <rule class='x'>), and rules can nest — so tokenize instead of matching
+# whole <rule>..</rule> pairs with one regex.
+# [^>]* tolerates stray extra attributes (13:37 carries a leaked Bootstrap
+# tooltip attribute in the source data).
+TAG_RE = re.compile(r"<rule class=['\"]?([a-z_0-9]+)['\"]?[^>]*>|</rule>")
 
 
 def parse_tajweed(marked):
     """Turn '<rule class=x>..</rule>' markup into (plain_text, spans).
-    Spans are [start, end, rule] in code points of the plain text."""
-    out, spans, pos, last = [], [], 0, 0
-    for m in RULE_RE.finditer(marked):
+    Spans are [start, end, rule] in code points of the plain text; nested
+    rules emit inner spans first so renderers can give them precedence."""
+    out, spans, stack, pos, last = [], [], [], 0, 0
+    for m in TAG_RE.finditer(marked):
         head = marked[last : m.start()]
         out.append(head)
         pos += len(head)
-        body = m.group(2)
-        spans.append([pos, pos + len(body), m.group(1)])
-        out.append(body)
-        pos += len(body)
         last = m.end()
+        if m.group(1):  # opening tag
+            stack.append((m.group(1), pos))
+        elif stack:  # closing tag
+            rule, start = stack.pop()
+            spans.append([start, pos, rule])
+        # else: stray </rule> with no opener — drop it
     out.append(marked[last:])
+    pos += len(marked) - last
+    for rule, start in stack:  # unclosed openers: close at end of text
+        spans.append([start, pos, rule])
     return "".join(out), spans
 
 
@@ -555,6 +566,11 @@ def validate():
         ("sajda ayahs", q("SELECT count(*) FROM ayahs WHERE sajda_type IS NOT NULL"), 15),
         ("wbw en missing", q("SELECT count(*) FROM words WHERE tr_en IS NULL"), None),
         ("wbw bn missing", q("SELECT count(*) FROM words WHERE tr_bn IS NULL"), None),
+        ("unparsed tajweed markup (ayah)",
+         q("SELECT count(*) FROM tajweed_ayah WHERE text LIKE '%<rule%' "
+           "OR text LIKE '%</rule%' OR text LIKE '%<%'"), 0),
+        ("unparsed tajweed markup (word)",
+         q("SELECT count(*) FROM words WHERE tajweed_text LIKE '%<%'"), 0),
     ]
     ok = True
     for name, got, want in checks:
