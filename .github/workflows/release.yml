@@ -1,0 +1,229 @@
+# Builds and publishes release binaries for every platform when a version tag
+# (v1.0.0, v2.3.1, ...) is pushed:
+#
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+# Outputs attached to the GitHub Release:
+#   - Linux   .tar.gz bundle (needs system libmpv for audio: apt install libmpv2)
+#   - Windows .zip bundle
+#   - Android .apk (debug-signed unless keystore secrets are configured)
+#   - macOS   .zip of the .app (unsigned — right-click > Open on first launch)
+#   - iOS     unsigned .ipa (cannot run on devices without signing; usable for
+#             sideloading via AltStore/Sideloadly or resigning with your own cert)
+
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+env:
+  FLUTTER_VERSION: 3.44.9
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Skip the ~700 MB raw data/ tree — builds only need the app dirs.
+          sparse-checkout: |
+            assets
+            lib
+            android
+            ios
+            linux
+            macos
+            windows
+            web
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Install Linux desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+      - run: flutter pub get
+      - name: Analyze (sanity gate for the whole release)
+        run: flutter analyze
+      - name: Build
+        run: flutter build linux --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
+      - name: Package
+        run: tar -czf "quran-researcher-${GITHUB_REF_NAME}-linux-x64.tar.gz" -C build/linux/x64/release/bundle .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: quran-researcher-*-linux-x64.tar.gz
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Skip the ~700 MB raw data/ tree — builds only need the app dirs.
+          sparse-checkout: |
+            assets
+            lib
+            android
+            ios
+            linux
+            macos
+            windows
+            web
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Build
+        run: flutter build windows --release --build-name="$($env:GITHUB_REF_NAME.TrimStart('v'))" --build-number=${{ github.run_number }}
+      - name: Package
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "quran-researcher-$env:GITHUB_REF_NAME-windows-x64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: quran-researcher-*-windows-x64.zip
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Skip the ~700 MB raw data/ tree — builds only need the app dirs.
+          sparse-checkout: |
+            assets
+            lib
+            android
+            ios
+            linux
+            macos
+            windows
+            web
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      # Optional Play-Store-grade signing. Configure two repository secrets:
+      #   ANDROID_KEYSTORE_BASE64  — `base64 -w0 your.keystore`
+      #   ANDROID_KEY_PROPERTIES   — key.properties content, with
+      #                              storeFile=release.keystore
+      # Without them the APK is debug-signed (installable, not store-ready).
+      - name: Set up release signing (if secrets provided)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_PROPERTIES: ${{ secrets.ANDROID_KEY_PROPERTIES }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEY_PROPERTIES" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/release.keystore
+            printf '%s\n' "$ANDROID_KEY_PROPERTIES" > android/key.properties
+            echo "Release signing configured."
+          else
+            echo "No signing secrets - APK will be debug-signed."
+          fi
+      - name: Build APK
+        run: flutter build apk --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
+      - name: Package
+        run: cp build/app/outputs/flutter-apk/app-release.apk "quran-researcher-${GITHUB_REF_NAME}-android.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: quran-researcher-*-android.apk
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Skip the ~700 MB raw data/ tree — builds only need the app dirs.
+          sparse-checkout: |
+            assets
+            lib
+            android
+            ios
+            linux
+            macos
+            windows
+            web
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Build
+        run: flutter build macos --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
+      - name: Package
+        run: ditto -c -k --sequesterRsrc --keepParent "build/macos/Build/Products/Release/Quran Researcher.app" "quran-researcher-${GITHUB_REF_NAME}-macos.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: quran-researcher-*-macos.zip
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Skip the ~700 MB raw data/ tree — builds only need the app dirs.
+          sparse-checkout: |
+            assets
+            lib
+            android
+            ios
+            linux
+            macos
+            windows
+            web
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - name: Build (unsigned)
+        run: flutter build ios --release --no-codesign --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
+      - name: Package unsigned ipa
+        run: |
+          mkdir Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qry "quran-researcher-${GITHUB_REF_NAME}-ios-unsigned.ipa" Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: quran-researcher-*-ios-unsigned.ipa
+
+  release:
+    needs: [linux, windows, android, macos, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+          body: |
+            **Quran Researcher ${{ github.ref_name }}**
+
+            | Platform | Notes |
+            |---|---|
+            | Linux | Extract and run `quran_app`. Audio needs libmpv: `sudo apt install libmpv2` |
+            | Windows | Extract and run `quran_app.exe` |
+            | Android | Debug-signed APK — allow "install from unknown sources" |
+            | macOS | Unsigned — right-click the app → Open on first launch |
+            | iOS | Unsigned ipa — requires sideloading (AltStore/Sideloadly) or resigning |
+
+            Data: Quranic Universal Library (qul.tarteel.ai) · Arramooz (GPL, linuxscout/arramooz)
