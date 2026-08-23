@@ -102,14 +102,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final first = positions
         .where((p) => p.itemTrailingEdge > 0)
         .reduce((a, b) => a.index < b.index ? a : b);
-    final ayahs = ref.read(surahAyahsProvider(widget.surahId)).valueOrNull;
+    final ayahs = ref.read(surahAyahsProvider(widget.surahId)).value;
     if (ayahs == null || first.index >= ayahs.length) return;
     ref.read(lastReadProvider.notifier).set(ayahs[first.index].verseKey);
   }
 
   @override
   Widget build(BuildContext context) {
-    final surahs = ref.watch(surahsProvider).valueOrNull;
+    final surahs = ref.watch(surahsProvider).value;
     final surah = surahs?.where((s) => s.id == widget.surahId).firstOrNull;
     final ayahs = ref.watch(surahAyahsProvider(widget.surahId));
 
@@ -132,7 +132,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             icon: const Icon(Icons.auto_stories_outlined),
             tooltip: context.l10n.mushafView,
             onPressed: () {
-              final list = ayahs.valueOrNull;
+              final list = ayahs.value;
               if (list == null || list.isEmpty) return;
               final positions = _positions.itemPositions.value;
               var index = 0;
@@ -207,7 +207,7 @@ class _BismillahHeader extends ConsumerWidget {
       );
     }
     if (!show) return const SizedBox(height: 8);
-    final text = ref.watch(_bismillahProvider(settings.scriptSlug)).valueOrNull;
+    final text = ref.watch(_bismillahProvider(settings.scriptSlug)).value;
     if (text == null) return const SizedBox(height: 8);
     // Strip the "١" ayah-number glyph qpc-hafs carries on 1:1.
     final display = text.replaceAll(RegExp(r'\s*[١1]\s*$'), '');

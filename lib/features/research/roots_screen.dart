@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/research_repo.dart';
@@ -60,7 +61,7 @@ class RootScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final root = ref.watch(rootProvider(rootId)).valueOrNull;
+    final root = ref.watch(rootProvider(rootId)).value;
     final occurrences = ref.watch(rootOccurrencesProvider(rootId));
     return Scaffold(
       appBar: AppBar(

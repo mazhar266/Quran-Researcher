@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:go_router/go_router.dart';
 
@@ -68,7 +69,7 @@ class TopicScreen extends ConsumerWidget {
     final children = ref.watch(topicChildrenProvider(topicId));
     return Scaffold(
       appBar: AppBar(
-        title: Text(topic.valueOrNull?.name ?? 'Topic'),
+        title: Text(topic.value?.name ?? 'Topic'),
       ),
       body: topic.when(
         loading: () => const Center(child: CircularProgressIndicator()),

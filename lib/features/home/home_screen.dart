@@ -119,7 +119,7 @@ class _BookmarksTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarks = ref.watch(bookmarksProvider);
-    final surahs = ref.watch(surahsProvider).valueOrNull;
+    final surahs = ref.watch(surahsProvider).value;
     if (bookmarks.isEmpty) {
       return Center(child: Text(context.l10n.noBookmarks));
     }

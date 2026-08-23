@@ -57,6 +57,7 @@ class QuranApp extends ConsumerWidget {
     final theme = ref.watch(settingsProvider.select((s) => s.theme));
     final language = ref.watch(settingsProvider.select((s) => s.appLanguage));
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Quran Researcher',
       theme: AppTheme.of(theme),
       locale: language == 'system' ? null : Locale(language),

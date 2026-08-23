@@ -49,3 +49,4 @@ app.*.map.json
 
 # Android release signing secrets
 android/key.properties
+/lib/generated/
