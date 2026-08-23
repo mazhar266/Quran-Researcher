@@ -1,17 +1,109 @@
-# quran_app
+<img src="icon.png" alt="Quran Researcher icon" width="96" align="right"/>
 
-A new Flutter project.
+# Quran Researcher
 
-## Getting Started
+A Quran reading and **research** app for every platform Flutter reaches — Android, iOS, Windows, macOS, Linux, and the web. Fully offline: the complete text in 21 scripts, translations, ten tafsir books, word-level morphology, a classical Arabic dictionary, and the research tools most Quran apps lack.
 
-This project is a starting point for a Flutter application.
+Bilingual by design: English and Bengali (বাংলা) — UI, translations, word-by-word glosses, and tafsir.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Read
+- **21 script variants** — Uthmani, QPC Hafs, IndoPak Nastaleeq in the reader; Imlaei, Digital Khatt, and more in the data
+- **Tajweed colors** — all 18 QPC rule classes, with a legend and per-rule toggles
+- **Mushaf page mode** — all 604 pages in the authentic QPC per-page fonts, swiped right-to-left like a physical mushaf
+- **Word-by-word** interlinear English + Bangla glosses, transliteration, footnoted Sahih International
+- **Warsh riwayah** as a script option (Arabic-only, with its own ayah numbering)
+- Navigation by surah, juz, or page · bookmarks · continue-where-you-left-off · light/dark/sepia themes
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Listen
+- Two reciters (Mishari Rashid al-Afasy, Mahmoud Khalil al-Husary), streamed and cached for offline replay
+- **Word-level highlighting** that follows the recitation in real time
+- Repeat one ayah or an A–B range — built for memorization
+- Background playback with lock-screen controls on mobile
+
+### Understand
+- **Ten tafsir books** — Ibn Kathir, Ma'arif-ul-Quran, Al-Jalalayn, Tazkirul Quran, Mukhtasar (English); Ibn Kaseer, Abu Bakr Zakaria, Ahsanul Bayaan, Fathul Majid, Mokhtasar (বাংলা)
+- Long-form surah introductions
+- Full-text search across Arabic, English, Bangla, and transliteration
+
+### Research
+- **Tap any word** → its meaning, root, lemma, stem, and classical dictionary entry
+- **Root explorer** — 1,642 trilateral roots with every occurrence in the corpus (50,298 word–root links)
+- **Arramooz dictionary** — 30,213 nouns and 10,637 verbs with wazn, plurals, and Arabic definitions
+- **Similar-ayah navigation** with match ranges highlighted
+- **Mutashabihat study mode** — repeated phrases across the mushaf, with a hide-and-recall mode for hifz review
+- **Ayah themes** and a **2,512-topic ontology** with cross-linked descriptions
+
+## Getting started
+
+```bash
+flutter pub get
+flutter run          # pick your device: Linux, Chrome, Android, ...
+```
+
+Prebuilt databases ship in `assets/db/`, so a plain checkout builds and runs. First launch copies them to app storage (a few seconds, once).
+
+**Linux audio** needs the system libmpv: `sudo apt install libmpv-dev` (the app runs fine without it — playback is disabled and tells you what to install).
+
+### Rebuilding the data (optional)
+
+The app's databases are produced from the raw datasets in `data/` by a single ETL script:
+
+```bash
+python3 etl/build.py            # full build into dist/ (+ --skip-fonts for a fast run)
+cp dist/*.db assets/db/         # refresh the app's bundled databases
+```
+
+The ETL flattens QUL's archive layout, parses tajweed markup into span data, normalizes Arabic roots so QUL and Arramooz join, builds FTS5 indexes, packages the 604 page fonts, and self-validates (20 checks: entity counts, section coverage, markup leaks, dictionary joins).
+
+## Architecture
+
+| Layer | Choice |
+|---|---|
+| Data | Prebuilt SQLite modules (drift) — native FFI on mobile/desktop, WASM + OPFS on web; opened read-only with mmap tuning |
+| State | riverpod |
+| Navigation | go_router (deep-linkable: `/surah/2?ayah=255`, `/mushaf/302`) |
+| Audio | just_audio + just_audio_background (mobile), media_kit/libmpv (desktop) |
+| Localization | flutter gen-l10n — English + বাংলা |
+
+```
+etl/          Python ETL: raw data → versioned SQLite modules + manifest
+data/         raw source datasets (QUL export, Arramooz submodule)
+assets/db/    the modules the app ships (core, 10 tafsirs, audio, dictionary)
+lib/
+  data/       drift access layer, repositories, settings
+  audio/      playback controller, word-timing sync
+  tajweed/    rule palette + span builder
+  features/   home · reader · mushaf · search · research · settings
+docs/         development plan (phase-by-phase record)
+```
+
+## Testing
+
+```bash
+flutter test        # 37 tests, incl. end-to-end queries against the real DBs
+```
+
+The database tests read `dist/`, so run the ETL once first. A golden test pins Arabic text rendering (tajweed colors + highlight).
+
+## Releases
+
+Pushing a version tag builds and publishes all platforms via GitHub Actions:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+Artifacts: Linux `.tar.gz`, Windows `.zip`, Android `.apk`, macOS `.zip` (unsigned), iOS `.ipa` (unsigned, for sideloading). Android is debug-signed unless `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEY_PROPERTIES` secrets are configured.
+
+## Data sources & attribution
+
+| Source | Content | License / terms |
+|---|---|---|
+| [Quranic Universal Library](https://qul.tarteel.ai) (Tarteel) | Quran text in all scripts, translations, tafsirs, morphology, audio timings, page fonts, metadata | Per-resource attribution required |
+| [Arramooz Alwaseet](https://github.com/linuxscout/arramooz) (Taha Zerrouki) | Classical Arabic morphological dictionary | GPL |
+| King Fahd Glorious Quran Printing Complex (via QUL) | KFGQPC fonts (Hafs, Warsh, page fonts) | Per KFGQPC terms |
+| [audio-cdn.tarteel.ai](https://qul.tarteel.ai) | Recitation MP3 streams | Streamed at runtime |
+
+Verify each resource's redistribution terms before publishing to app stores.
