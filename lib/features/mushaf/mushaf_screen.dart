@@ -44,7 +44,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
       }
     }
     final juz =
-        ref.watch(pageAyahsProvider(_page)).valueOrNull?.firstOrNull?.juz;
+        ref.watch(pageAyahsProvider(_page)).value?.firstOrNull?.juz;
 
     return Scaffold(
       appBar: AppBar(
@@ -121,9 +121,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   }
 
   Future<void> _showAyahList() async {
-    final ayahs = ref.read(pageAyahsProvider(_page)).valueOrNull;
+    final ayahs = ref.read(pageAyahsProvider(_page)).value;
     if (ayahs == null || ayahs.isEmpty || !mounted) return;
-    final surahs = ref.read(surahsProvider).valueOrNull;
+    final surahs = ref.read(surahsProvider).value;
     showModalBottomSheet<void>(
       context: context,
       builder: (context) => ListView(
@@ -154,7 +154,7 @@ class _MushafPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final font = ref.watch(pageFontProvider(page));
     final ayahs = ref.watch(pageAyahsProvider(page));
-    final surahs = ref.watch(surahsProvider).valueOrNull;
+    final surahs = ref.watch(surahsProvider).value;
     final scheme = Theme.of(context).colorScheme;
 
     if (font.isLoading || ayahs.isLoading) {

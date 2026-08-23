@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
-    final resources = ref.watch(translationResourcesProvider).valueOrNull ?? [];
+    final resources = ref.watch(translationResourcesProvider).value ?? [];
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.settingsTooltip)),
