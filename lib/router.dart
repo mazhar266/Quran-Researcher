@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import 'features/about/about_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/mushaf/mushaf_screen.dart';
 import 'features/reader/reader_screen.dart';
@@ -61,5 +62,6 @@ final router = GoRouter(
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
     GoRoute(
         path: '/settings', builder: (context, state) => const SettingsScreen()),
+    GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
   ],
 );

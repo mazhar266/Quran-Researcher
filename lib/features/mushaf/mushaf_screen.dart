@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -61,17 +62,36 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
           ),
         ],
       ),
-      // RTL so swiping like turning a physical mushaf page.
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: PageView.builder(
-          controller: _controller,
-          itemCount: mushafPageCount,
-          onPageChanged: (i) => setState(() => _page = i + 1),
-          itemBuilder: (context, i) => _MushafPage(page: i + 1),
+      // RTL so swiping like turning a physical mushaf page. Arrow keys and
+      // PageUp/PageDown turn pages on desktop and web.
+      body: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+              _turn(1),
+          const SingleActivator(LogicalKeyboardKey.pageDown): () => _turn(1),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+              _turn(-1),
+          const SingleActivator(LogicalKeyboardKey.pageUp): () => _turn(-1),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: mushafPageCount,
+              onPageChanged: (i) => setState(() => _page = i + 1),
+              itemBuilder: (context, i) => _MushafPage(page: i + 1),
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  void _turn(int delta) {
+    final target = (_page + delta).clamp(1, mushafPageCount);
+    if (target != _page) _controller.jumpToPage(target - 1);
   }
 
   Future<void> _askPage() async {

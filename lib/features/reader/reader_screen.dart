@@ -9,12 +9,14 @@ import '../../data/db.dart';
 import '../../data/models.dart';
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import '../../l10n/l10n.dart';
 import '../../tajweed/tajweed.dart';
 import '../research/ayah_research_sheet.dart';
 import '../research/surah_info_sheet.dart';
 import '../research/word_sheet.dart';
 import 'player_bar.dart';
 import 'tafsir_sheet.dart';
+import 'translation_text.dart';
 
 /// (surah id, settings that affect the query) -> ayah views.
 final surahAyahsProvider = FutureProvider.family<List<AyahView>, int>((
@@ -121,13 +123,13 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
           if (surah != null)
             IconButton(
               icon: const Icon(Icons.info_outline),
-              tooltip: 'About this surah',
+              tooltip: context.l10n.aboutSurah,
               onPressed: () =>
                   showSurahInfoSheet(context, surah.id, surah.nameSimple),
             ),
           IconButton(
             icon: const Icon(Icons.auto_stories_outlined),
-            tooltip: 'Mushaf page view',
+            tooltip: context.l10n.mushafView,
             onPressed: () {
               final list = ayahs.valueOrNull;
               if (list == null || list.isEmpty) return;
@@ -200,10 +202,7 @@ class _BismillahHeader extends ConsumerWidget {
           color: Theme.of(context).colorScheme.secondaryContainer,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Text(
-          'Warsh riwayah — its ayah numbering differs from Hafs, so '
-          'translations, word-by-word, and audio are hidden in this script.',
-        ),
+        child: Text(context.l10n.warshNotice),
       );
     }
     if (!show) return const SizedBox(height: 8);
@@ -287,7 +286,7 @@ class AyahTile extends ConsumerWidget {
                     Icons.play_circle_outline,
                     color: isPlayingAyah ? scheme.primary : null,
                   ),
-                  tooltip: 'Play from here',
+                  tooltip: context.l10n.playFromHere,
                   onPressed: () async {
                     try {
                       await ref
@@ -307,13 +306,13 @@ class AyahTile extends ConsumerWidget {
                 ),
               IconButton(
                 icon: const Icon(Icons.menu_book_outlined),
-                tooltip: 'Tafsir',
+                tooltip: context.l10n.tafsirTooltip,
                 onPressed: () => showTafsirSheet(context, ayah.verseKey),
               ),
               if (!settings.isWarsh)
                 IconButton(
                   icon: const Icon(Icons.science_outlined),
-                  tooltip: 'Research: similar ayahs, phrases, themes',
+                  tooltip: context.l10n.researchTooltip,
                   onPressed: () =>
                       showAyahResearchSheet(context, ayah.surah, ayah.ayah),
                 ),
@@ -322,7 +321,9 @@ class AyahTile extends ConsumerWidget {
                   bookmarked ? Icons.bookmark : Icons.bookmark_outline,
                   color: bookmarked ? scheme.primary : null,
                 ),
-                tooltip: bookmarked ? 'Remove bookmark' : 'Bookmark',
+                tooltip: bookmarked
+                    ? context.l10n.bookmarkRemove
+                    : context.l10n.bookmarkAdd,
                 onPressed: () =>
                     ref.read(bookmarksProvider.notifier).toggle(ayah.verseKey),
               ),
@@ -366,9 +367,11 @@ class AyahTile extends ConsumerWidget {
           for (final entry in ayah.translations.entries)
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Text(
-                entry.value,
-                style: const TextStyle(fontSize: 15.5, height: 1.5),
+              child: TranslationText(
+                text: entry.value,
+                resourceSlug: entry.key,
+                surah: ayah.surah,
+                ayah: ayah.ayah,
               ),
             ),
         ],

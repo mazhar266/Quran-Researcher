@@ -46,3 +46,6 @@ app.*.map.json
 
 # ETL output (regenerate with: python3 etl/build.py)
 /dist/
+
+# Android release signing secrets
+android/key.properties

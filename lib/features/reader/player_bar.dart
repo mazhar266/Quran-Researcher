@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../audio/audio_controller.dart';
 import '../../data/audio_repo.dart';
+import '../../l10n/l10n.dart';
 
 /// Persistent bar at the bottom of the reader while audio is loaded.
 class PlayerBar extends ConsumerWidget {
@@ -42,7 +43,7 @@ class PlayerBar extends ConsumerWidget {
                       },
                     ),
                   ),
-                  Text('Ayah ${playback.currentVerseKey ?? ''}',
+                  Text(context.l10n.ayahLabel(playback.currentVerseKey ?? ''),
                       style: TextStyle(color: scheme.onSurfaceVariant)),
                 ],
               ),
@@ -50,9 +51,9 @@ class PlayerBar extends ConsumerWidget {
                 children: [
                   IconButton(
                     tooltip: switch (playback.repeat) {
-                      RepeatSetting.off => 'Repeat: off',
-                      RepeatSetting.ayah => 'Repeat: this ayah',
-                      RepeatSetting.range => 'Repeat: range',
+                      RepeatSetting.off => context.l10n.repeatOff,
+                      RepeatSetting.ayah => context.l10n.repeatAyah,
+                      RepeatSetting.range => context.l10n.repeatRange,
                     },
                     icon: Icon(
                       switch (playback.repeat) {
@@ -70,36 +71,36 @@ class PlayerBar extends ConsumerWidget {
                     TextButton(
                       onPressed: controller.setRangeStart,
                       child: Text(playback.rangeStartAyah == null
-                          ? 'Set A'
+                          ? context.l10n.setRangeA
                           : 'A:${playback.rangeStartAyah}'),
                     ),
                     TextButton(
                       onPressed: controller.setRangeEnd,
                       child: Text(playback.rangeEndAyah == null
-                          ? 'Set B'
+                          ? context.l10n.setRangeB
                           : 'B:${playback.rangeEndAyah}'),
                     ),
                   ],
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.skip_previous),
-                    tooltip: 'Previous ayah',
+                    tooltip: context.l10n.previousAyah,
                     onPressed: controller.previous,
                   ),
                   IconButton.filled(
                     icon: Icon(playback.playing ? Icons.pause : Icons.play_arrow),
-                    tooltip: playback.playing ? 'Pause' : 'Play',
+                    tooltip: playback.playing ? context.l10n.pause : context.l10n.play,
                     onPressed: controller.togglePlay,
                   ),
                   IconButton(
                     icon: const Icon(Icons.skip_next),
-                    tooltip: 'Next ayah',
+                    tooltip: context.l10n.nextAyah,
                     onPressed: controller.next,
                   ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    tooltip: 'Stop',
+                    tooltip: context.l10n.stop,
                     onPressed: controller.stop,
                   ),
                 ],

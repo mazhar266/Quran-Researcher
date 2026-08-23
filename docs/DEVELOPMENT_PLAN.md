@@ -286,20 +286,66 @@ rules and word-boundary splits, corpus-wide rule-palette coverage on surah 2,
 mushaf page queries, Warsh row counts, fontpack integrity); Linux debug and
 web release builds succeed.
 
-### Phase 4 — Research layer (~4 weeks)
+### Phase 4 — Research layer ✅ DONE
 
-Root/lemma/stem explorer with corpus-wide occurrences; tap-a-word → morphology
-sheet with an **Arramooz dictionary tab** (root → classical entries: wazn,
-derived nouns/verbs, plurals, Arabic definitions); similar-ayah navigation
-with match-range highlighting; mutashabihat study mode for hifz; themes
-browser; topic ontology with cross-links; surah introductions.
+Home gains a Research tab. **Tap a word** (word-by-word mode) → morphology
+sheet: root (with corpus count, linking to the root screen), lemma, stem, and
+the **Arramooz dictionary** — verb forms as chips plus defined nouns with
+wazn, word type, and Arabic definitions. **Root explorer** searches 1,642
+roots by Arabic letters or latin key and lists every occurrence with its
+word and gloss, jumping into the reader. **Ayah research** (flask button on
+each ayah): similar ayahs with score/coverage and match-range highlighting;
+mutashabihat phrases; covering themes. **Mutashabihat browser** ranks the
+most-repeated phrases; the phrase screen has a **hifz study mode** that shows
+only the shared phrase and asks you to recall the ayah before revealing.
+**Themes** and the **topic ontology** (2,512 topics, `<topic>` cross-links
+made tappable, ayah chips, subtopics) are searchable; **surah introductions**
+open from the reader's info button. Fixed en route: `scripts_extra.db` and
+`dict_ar.db` were missing from assets (Warsh would have failed at runtime).
 
-### Phase 5 — Polish & release (~2–3 weeks)
+Verified: analyze clean; 31 tests pass (morphology joins incl. root اله =
+2,851 occurrences, dictionary join, similar-ayah ranges, phrase 50 = 71 hits
+across 70 ayahs, themes, topics, surah info); Linux + web builds succeed.
 
-Accessibility (screen readers, dynamic type), localized UI (EN/BN),
-attribution screen per QUL/Arramooz licensing, performance passes (page-font
-eviction, web first-load), store packaging + PWA deployment, golden tests for
-Arabic rendering.
+### Phase 5 — Polish & release ✅ DONE
+
+**Localization**: full gen-l10n setup with English and Bangla ARB files
+(~70 strings) covering home, reader, player, search, settings, and the
+research hub; an App Language setting (system/EN/BN) switches at runtime.
+Research detail screens (roots/phrase/topic internals) remain English-first.
+
+**Attribution**: Settings → About lists every data source with its terms —
+QUL, Tarteel CDN recitations, KFGQPC fonts, Arramooz (GPL), and the
+translation/tafsir authors — plus Flutter's license page and the app version.
+
+**Accessibility & desktop**: every control carries a tooltip/semantic label;
+mushaf pages turn with arrow keys and PgUp/PgDn on desktop and web.
+
+**Quality**: a golden test locks Arabic rendering (real KFGQPC font, tajweed
+colors, range highlight) — regenerate with `--update-goldens` after
+intentional visual changes. 33 tests total.
+
+**Packaging**: Android release signing reads `android/key.properties`
+(template committed, secrets gitignored; debug-signs without it); Linux has
+the CMake gcc-13 guard and a `.desktop` file; web builds as an installable
+PWA with the app icons.
+
+### Release guide
+
+- **Android**: create a keystore (see `android/key.properties.example`), copy
+  the example to `android/key.properties`, then
+  `flutter build appbundle --release`.
+- **Web/PWA**: `flutter build web --release` → deploy `build/web/` to any
+  static host (ensure gzip/brotli — core.db compresses well); assets load on
+  demand, so first paint doesn't wait for the databases.
+- **Linux**: `flutter build linux --release`; install
+  `linux/quran-researcher.desktop` + `icon.png` per its comments (deb/flatpak
+  packaging remains future work).
+- **Windows/macOS/iOS**: `flutter build windows|macos|ipa` on the respective
+  OS — configuration (ids, icons, entitlements) is already in place.
+- Bundle sizes: ~340 MB web / ~390 MB Linux, dominated by the offline
+  databases and the mushaf fontpack. Moving modules to CDN download-on-demand
+  (the `openModuleDb` seam) is the lever if smaller installs are wanted.
 
 ---
 

@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'audio/libmpv_check_stub.dart'
     if (dart.library.ffi) 'audio/libmpv_check_native.dart';
 import 'data/prefs.dart';
+import 'l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme/app_theme.dart';
 
@@ -54,9 +55,13 @@ class QuranApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(settingsProvider.select((s) => s.theme));
+    final language = ref.watch(settingsProvider.select((s) => s.appLanguage));
     return MaterialApp.router(
       title: 'Quran Researcher',
       theme: AppTheme.of(theme),
+      locale: language == 'system' ? null : Locale(language),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
     );
   }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import '../../l10n/l10n.dart';
 import '../../tajweed/tajweed.dart';
 import '../../theme/app_theme.dart';
 
@@ -16,10 +19,10 @@ class SettingsScreen extends ConsumerWidget {
     final resources = ref.watch(translationResourcesProvider).valueOrNull ?? [];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.l10n.settingsTooltip)),
       body: ListView(
         children: [
-          const _SectionHeader('Arabic script'),
+          _SectionHeader(context.l10n.sectionScript),
           RadioGroup<String>(
             groupValue: settings.scriptSlug,
             onChanged: (v) => notifier.update((s) => s.copyWith(scriptSlug: v)),
@@ -33,7 +36,7 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const _SectionHeader('Arabic font size'),
+          _SectionHeader(context.l10n.sectionFontSize),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Slider(
@@ -46,42 +49,44 @@ class SettingsScreen extends ConsumerWidget {
                   notifier.update((s) => s.copyWith(arabicFontSize: v)),
             ),
           ),
-          const _SectionHeader('Tajweed'),
+          _SectionHeader(context.l10n.sectionTajweed),
           SwitchListTile(
-            title: const Text('Tajweed colors'),
-            subtitle: const Text(
-                'Color recitation rules in the Uthmani/QPC Hafs scripts'),
+            title: Text(context.l10n.tajweedColors),
+            subtitle: Text(context.l10n.tajweedColorsSub),
             value: settings.tajweedColors,
             onChanged: (v) =>
                 notifier.update((s) => s.copyWith(tajweedColors: v)),
           ),
           ListTile(
             enabled: settings.tajweedColors,
-            title: const Text('Rule legend & toggles'),
+            title: Text(context.l10n.tajweedLegend),
             subtitle: Text(settings.tajweedDisabledRules.isEmpty
-                ? 'All ${tajweedRules.length} rules shown'
-                : '${settings.tajweedDisabledRules.length} rules hidden'),
+                ? context.l10n.tajweedAllShown(tajweedRules.length)
+                : context.l10n
+                    .tajweedHidden(settings.tajweedDisabledRules.length)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showTajweedLegend(context),
           ),
-          const _SectionHeader('Display'),
+          _SectionHeader(context.l10n.sectionDisplay),
           SwitchListTile(
-            title: const Text('Word-by-word glosses'),
-            subtitle: const Text('Show each word with its English and Bangla meaning'),
+            title: Text(context.l10n.wordByWord),
+            subtitle: Text(context.l10n.wordByWordSub),
             value: settings.wordByWord,
             onChanged: (v) => notifier.update((s) => s.copyWith(wordByWord: v)),
           ),
           SwitchListTile(
-            title: const Text('Transliteration'),
+            title: Text(context.l10n.transliteration),
             value: settings.transliteration,
             onChanged: (v) =>
                 notifier.update((s) => s.copyWith(transliteration: v)),
           ),
-          const _SectionHeader('Translations'),
+          _SectionHeader(context.l10n.sectionTranslations),
           for (final r in resources)
             CheckboxListTile(
               title: Text(r.name),
-              subtitle: Text(r.lang == 'en' ? 'English' : 'Bangla'),
+              subtitle: Text(r.lang == 'en'
+                  ? context.l10n.langEnglish
+                  : context.l10n.langBangla),
               value: settings.translationSlugs.contains(r.slug),
               onChanged: (checked) => notifier.update((s) {
                 final slugs = [...s.translationSlugs];
@@ -89,7 +94,7 @@ class SettingsScreen extends ConsumerWidget {
                 return s.copyWith(translationSlugs: slugs);
               }),
             ),
-          const _SectionHeader('Theme'),
+          _SectionHeader(context.l10n.sectionTheme),
           RadioGroup<ReadingTheme>(
             groupValue: settings.theme,
             onChanged: (v) => notifier.update((s) => s.copyWith(theme: v)),
@@ -99,13 +104,37 @@ class SettingsScreen extends ConsumerWidget {
                   RadioListTile<ReadingTheme>(
                     value: t,
                     title: Text(switch (t) {
-                      ReadingTheme.light => 'Light',
-                      ReadingTheme.dark => 'Dark',
-                      ReadingTheme.sepia => 'Sepia (paper)',
+                      ReadingTheme.light => context.l10n.themeLight,
+                      ReadingTheme.dark => context.l10n.themeDark,
+                      ReadingTheme.sepia => context.l10n.themeSepia,
                     }),
                   ),
               ],
             ),
+          ),
+          _SectionHeader(context.l10n.sectionLanguage),
+          RadioGroup<String>(
+            groupValue: settings.appLanguage,
+            onChanged: (v) =>
+                notifier.update((s) => s.copyWith(appLanguage: v)),
+            child: Column(
+              children: [
+                RadioListTile<String>(
+                    value: 'system', title: Text(context.l10n.langSystem)),
+                RadioListTile<String>(
+                    value: 'en', title: Text(context.l10n.langEnglish)),
+                RadioListTile<String>(
+                    value: 'bn', title: Text(context.l10n.langBangla)),
+              ],
+            ),
+          ),
+          _SectionHeader(context.l10n.sectionAbout),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(context.l10n.aboutTitle),
+            subtitle: Text(context.l10n.aboutSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/about'),
           ),
           const SizedBox(height: 32),
         ],

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/models.dart';
 import '../../data/repo.dart';
+import '../../l10n/l10n.dart';
 
 final _queryProvider = StateProvider<String>((ref) => '');
 
@@ -46,8 +47,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       appBar: AppBar(
         title: TextField(
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Search Arabic, English, Bangla, transliteration…',
+          decoration: InputDecoration(
+            hintText: context.l10n.searchHint,
             border: InputBorder.none,
           ),
           onChanged: _onChanged,
@@ -58,7 +59,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         error: (e, _) => Center(child: Text('Search failed.\n$e')),
         data: (hits) {
           if (hits.isEmpty) {
-            return const Center(child: Text('Type at least two characters to search.'));
+            return Center(child: Text(context.l10n.searchMinChars));
           }
           return ListView.builder(
             itemCount: hits.length,

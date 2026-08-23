@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/models.dart';
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
+import '../../l10n/l10n.dart';
 import '../research/research_tab.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -17,31 +18,31 @@ class HomeScreen extends ConsumerWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Quran Researcher'),
+          title: Text(context.l10n.appTitle),
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
-              tooltip: 'Search',
+              tooltip: context.l10n.searchTooltip,
               onPressed: () => context.push('/search'),
             ),
             IconButton(
               icon: const Icon(Icons.settings_outlined),
-              tooltip: 'Settings',
+              tooltip: context.l10n.settingsTooltip,
               onPressed: () => context.push('/settings'),
             ),
           ],
-          bottom: const TabBar(isScrollable: true, tabs: [
-            Tab(text: 'Surahs'),
-            Tab(text: 'Juz'),
-            Tab(text: 'Bookmarks'),
-            Tab(text: 'Research'),
+          bottom: TabBar(isScrollable: true, tabs: [
+            Tab(text: context.l10n.tabSurahs),
+            Tab(text: context.l10n.tabJuz),
+            Tab(text: context.l10n.tabBookmarks),
+            Tab(text: context.l10n.tabResearch),
           ]),
         ),
         floatingActionButton: lastRead == null
             ? null
             : FloatingActionButton.extended(
                 icon: const Icon(Icons.menu_book),
-                label: Text('Continue $lastRead'),
+                label: Text(context.l10n.continueReading(lastRead)),
                 onPressed: () {
                   final parts = lastRead.split(':');
                   context.push('/surah/${parts[0]}?ayah=${parts[1]}');
@@ -72,7 +73,7 @@ class _SurahTab extends ConsumerWidget {
             leading: CircleAvatar(child: Text('${s.id}')),
             title: Text(s.nameSimple),
             subtitle: Text(
-                '${s.revelationPlace == 'makkah' ? 'Makkah' : 'Madinah'} · ${s.versesCount} ayahs'),
+                '${s.revelationPlace == 'makkah' ? context.l10n.makkah : context.l10n.madinah} · ${context.l10n.ayahsCount(s.versesCount)}'),
             trailing: Text(
               s.nameArabic,
               style: const TextStyle(fontFamily: 'UthmanicHafs', fontSize: 20),
@@ -100,8 +101,9 @@ class _JuzTab extends ConsumerWidget {
           final j = list[i];
           return ListTile(
             leading: CircleAvatar(child: Text('${j.number}')),
-            title: Text('Juz ${j.number}'),
-            subtitle: Text('Starts at ${j.firstVerseKey} · ${j.versesCount} ayahs'),
+            title: Text(context.l10n.juzTitle(j.number)),
+            subtitle:
+                Text(context.l10n.juzStartsAt(j.firstVerseKey, j.versesCount)),
             onTap: () =>
                 context.push('/surah/${j.firstSurah}?ayah=${j.firstAyah}'),
           );
@@ -119,7 +121,7 @@ class _BookmarksTab extends ConsumerWidget {
     final bookmarks = ref.watch(bookmarksProvider);
     final surahs = ref.watch(surahsProvider).valueOrNull;
     if (bookmarks.isEmpty) {
-      return const Center(child: Text('No bookmarks yet — tap the bookmark icon on any ayah.'));
+      return Center(child: Text(context.l10n.noBookmarks));
     }
     String surahName(int id) =>
         surahs?.firstWhere((s) => s.id == id, orElse: () => _unknown(id)).nameSimple ??

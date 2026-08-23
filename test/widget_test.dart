@@ -37,4 +37,22 @@ void main() {
     expect(find.text('Al-Fatihah'), findsOneWidget);
     expect(find.text('Makkah · 7 ayahs'), findsOneWidget);
   });
+
+  testWidgets('Bangla app language localizes the home screen', (tester) async {
+    SharedPreferences.setMockInitialValues({'settings': '{"lang":"bn"}'});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        sharedPrefsProvider.overrideWithValue(prefs),
+        surahsProvider.overrideWith((ref) async => const [_fatiha]),
+        juzListProvider.overrideWith((ref) async => const []),
+      ],
+      child: const QuranApp(),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('কুরআন গবেষক'), findsOneWidget); // app title
+    expect(find.text('সূরা'), findsOneWidget); // Surahs tab
+    expect(find.text('মক্কী · ৭ আয়াত').evaluate().isNotEmpty ||
+        find.text('মক্কী · 7 আয়াত').evaluate().isNotEmpty, isTrue);
+  });
 }

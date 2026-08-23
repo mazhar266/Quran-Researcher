@@ -1,0 +1,8 @@
+# Copy to android/key.properties (gitignored) and fill in for Play releases.
+# Create a keystore with:
+#   keytool -genkey -v -keystore ~/quran-researcher.jks -keyalg RSA \
+#     -keysize 2048 -validity 10000 -alias quran
+storeFile=/home/you/quran-researcher.jks
+storePassword=CHANGE_ME
+keyAlias=quran
+keyPassword=CHANGE_ME

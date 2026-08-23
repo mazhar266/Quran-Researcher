@@ -30,6 +30,9 @@ class Settings {
   final bool tajweedColors;
   final List<String> tajweedDisabledRules;
 
+  /// 'system' | 'en' | 'bn'
+  final String appLanguage;
+
   const Settings({
     this.scriptSlug = 'qpc-hafs',
     this.translationSlugs = const ['en-sahih-international', 'bn-taisirul-quran'],
@@ -41,6 +44,7 @@ class Settings {
     this.tafsirBookSlug = 'en-tafisr-ibn-kathir',
     this.tajweedColors = false,
     this.tajweedDisabledRules = const [],
+    this.appLanguage = 'system',
   });
 
   String get fontFamily => readerScripts
@@ -66,6 +70,7 @@ class Settings {
     String? tafsirBookSlug,
     bool? tajweedColors,
     List<String>? tajweedDisabledRules,
+    String? appLanguage,
   }) =>
       Settings(
         scriptSlug: scriptSlug ?? this.scriptSlug,
@@ -78,6 +83,7 @@ class Settings {
         tafsirBookSlug: tafsirBookSlug ?? this.tafsirBookSlug,
         tajweedColors: tajweedColors ?? this.tajweedColors,
         tajweedDisabledRules: tajweedDisabledRules ?? this.tajweedDisabledRules,
+        appLanguage: appLanguage ?? this.appLanguage,
       );
 
   Map<String, dynamic> toJson() => {
@@ -91,6 +97,7 @@ class Settings {
         'tafsirBook': tafsirBookSlug,
         'tajweed': tajweedColors,
         'tajweedOff': tajweedDisabledRules,
+        'lang': appLanguage,
       };
 
   factory Settings.fromJson(Map<String, dynamic> j) => Settings(
@@ -107,6 +114,7 @@ class Settings {
         tajweedColors: j['tajweed'] as bool? ?? false,
         tajweedDisabledRules:
             (j['tajweedOff'] as List?)?.cast<String>() ?? const [],
+        appLanguage: j['lang'] as String? ?? 'system',
       );
 }
 
