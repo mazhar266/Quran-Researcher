@@ -7,7 +7,7 @@
 #   - Linux   .tar.gz bundle (needs system libmpv for audio: apt install libmpv2)
 #   - Windows .zip bundle
 #   - Android .apk (debug-signed unless keystore secrets are configured)
-#   - macOS   .zip of the .app (unsigned — right-click > Open on first launch)
+#   - macOS   .dmg containing the .app (unsigned)
 #   - iOS     unsigned .ipa (cannot run on devices without signing; usable for
 #             sideloading via AltStore/Sideloadly or resigning with your own cert)
 
@@ -161,12 +161,25 @@ jobs:
       - run: flutter pub get
       - name: Build
         run: flutter build macos --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
-      - name: Package
-        run: ditto -c -k --sequesterRsrc --keepParent "build/macos/Build/Products/Release/Quran Researcher.app" "quran-researcher-${GITHUB_REF_NAME}-macos.zip"
+      - name: Package DMG
+        run: |
+          DMG_ROOT="$RUNNER_TEMP/dmg-root"
+          DMG_NAME="quran-researcher-${GITHUB_REF_NAME}-macos.dmg"
+
+          mkdir -p "$DMG_ROOT"
+          cp -R "build/macos/Build/Products/Release/Quran Researcher.app" "$DMG_ROOT/"
+          ln -s /Applications "$DMG_ROOT/Applications"
+
+          hdiutil create \
+            -volname "Quran Researcher" \
+            -srcfolder "$DMG_ROOT" \
+            -ov \
+            -format UDZO \
+            "$DMG_NAME"
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: quran-researcher-*-macos.zip
+          path: quran-researcher-*-macos.dmg
 
   ios:
     runs-on: macos-latest
@@ -223,7 +236,7 @@ jobs:
             | Linux | Extract and run `quran_app`. Audio needs libmpv: `sudo apt install libmpv2` |
             | Windows | Extract and run `quran_app.exe` |
             | Android | Debug-signed APK — allow "install from unknown sources" |
-            | macOS | Unsigned — right-click the app → Open on first launch |
+            | macOS | Open the DMG, drag the app to Applications, then run `xattr -dr com.apple.quarantine "/Applications/Quran Researcher.app"` if macOS blocks first launch |
             | iOS | Unsigned ipa — requires sideloading (AltStore/Sideloadly) or resigning |
 
             Data: Quranic Universal Library (qul.tarteel.ai) · Arramooz (GPL, linuxscout/arramooz)
