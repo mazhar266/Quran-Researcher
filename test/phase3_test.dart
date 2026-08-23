@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,6 +42,38 @@ void main() {
         highlightColor: Colors.yellow,
       );
       expect(spans.single.style!.color, Colors.black);
+    });
+
+    test('recognizerFor attaches each word\'s tap recognizer to its segments',
+        () {
+      final requested = <int>[];
+      final recognizers = <int, TapGestureRecognizer>{};
+      final spans = buildTajweedSpans(
+        text: 'abc def',
+        spans: const [TajweedSpan(4, 6, 'ghunnah')],
+        disabledRules: const {},
+        activeWord: null,
+        base: base,
+        highlightColor: Colors.yellow,
+        recognizerFor: (pos) {
+          requested.add(pos);
+          return recognizers.putIfAbsent(pos, TapGestureRecognizer.new);
+        },
+      );
+      addTearDown(() {
+        for (final r in recognizers.values) {
+          r.dispose();
+        }
+      });
+      // Word 1 = 'abc'; word 2 = 'def' (split by the rule into 'de'+'f').
+      expect(requested.toSet(), {1, 2});
+      final word2 = spans
+          .where((s) => s.recognizer == recognizers[2])
+          .map((s) => s.text)
+          .join();
+      expect(word2, 'def');
+      final space = spans.firstWhere((s) => s.text == ' ');
+      expect(space.recognizer, isNull);
     });
 
     test('active word gets background, split across rule boundaries', () {

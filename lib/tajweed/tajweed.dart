@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show GestureRecognizer;
 import 'package:flutter/material.dart';
 
 /// One pre-parsed tajweed annotation: [start, end) in code points of the
@@ -46,7 +47,9 @@ final Map<String, Color> _ruleColors = {
 
 /// Builds colored spans for one ayah: tajweed rule colors (minus disabled
 /// rules) combined with a background highlight on the word being recited
-/// (1-based [activeWord], counting space-separated tokens).
+/// (1-based [activeWord], counting space-separated tokens). When
+/// [recognizerFor] is given, each word's segments share that word's tap
+/// recognizer (the caller owns recognizer disposal).
 List<TextSpan> buildTajweedSpans({
   required String text,
   required List<TajweedSpan> spans,
@@ -54,29 +57,29 @@ List<TextSpan> buildTajweedSpans({
   required int? activeWord,
   required TextStyle base,
   required Color highlightColor,
+  GestureRecognizer? Function(int wordPos)? recognizerFor,
 }) {
-  // Character range of the active word.
-  int? wordStart, wordEnd;
-  if (activeWord != null) {
-    var offset = 0, index = 0;
-    for (final token in text.split(' ')) {
-      index++;
-      if (index == activeWord) {
-        wordStart = offset;
-        wordEnd = offset + token.length;
-        break;
-      }
-      offset += token.length + 1;
-    }
+  // Character ranges of every word (1-based positions).
+  final words = <(int start, int end)>[];
+  var offset = 0;
+  for (final token in text.split(' ')) {
+    words.add((offset, offset + token.length));
+    offset += token.length + 1;
   }
+  (int, int)? active =
+      activeWord != null && activeWord <= words.length && activeWord >= 1
+          ? words[activeWord - 1]
+          : null;
 
-  // Cut points: every rule boundary + active-word boundary.
+  // Cut points: every rule boundary + every word boundary.
   final cuts = <int>{0, text.length};
   for (final s in spans) {
     cuts.add(s.start.clamp(0, text.length));
     cuts.add(s.end.clamp(0, text.length));
   }
-  if (wordStart != null) cuts.addAll([wordStart, wordEnd!]);
+  for (final w in words) {
+    cuts.addAll([w.$1, w.$2]);
+  }
   final sorted = cuts.toList()..sort();
 
   final result = <TextSpan>[];
@@ -93,9 +96,19 @@ List<TextSpan> buildTajweedSpans({
     final color = rule != null && !disabledRules.contains(rule)
         ? _ruleColors[rule]
         : null;
-    final highlighted = wordStart != null && a >= wordStart && b <= wordEnd!;
+    final highlighted = active != null && a >= active.$1 && b <= active.$2;
+    int? wordPos;
+    if (recognizerFor != null) {
+      for (var w = 0; w < words.length; w++) {
+        if (a >= words[w].$1 && b <= words[w].$2) {
+          wordPos = w + 1;
+          break;
+        }
+      }
+    }
     result.add(TextSpan(
       text: text.substring(a, b),
+      recognizer: wordPos == null ? null : recognizerFor!(wordPos),
       style: base.copyWith(
         color: color ?? base.color,
         backgroundColor: highlighted ? highlightColor : null,

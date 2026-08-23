@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' show Variable;
@@ -383,8 +384,35 @@ class AyahTile extends ConsumerWidget {
       '$n'.split('').map((d) => '٠١٢٣٤٥٦٧٨٩'[int.parse(d)]).join();
 }
 
+/// Owns per-word TapGestureRecognizers for continuous-text ayah widgets:
+/// recognizers are recreated each build and disposed with the state.
+mixin _WordTapRecognizers<T extends StatefulWidget> on State<T> {
+  final _recognizers = <TapGestureRecognizer>[];
+
+  void _clearRecognizers() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
+
+  TapGestureRecognizer recognizerFor(int surah, int ayah, int wordPos) {
+    final r = TapGestureRecognizer()
+      ..onTap = () => showWordSheet(context, '$surah:$ayah:$wordPos');
+    _recognizers.add(r);
+    return r;
+  }
+
+  @override
+  void dispose() {
+    _clearRecognizers();
+    super.dispose();
+  }
+}
+
 /// Tajweed-colored ayah text (QPC Hafs) with recitation word highlight.
-class _TajweedAyahText extends ConsumerWidget {
+/// Tapping a word opens its meaning, morphology, and dictionary entry.
+class _TajweedAyahText extends StatefulWidget {
   const _TajweedAyahText({
     required this.ayah,
     required this.settings,
@@ -396,7 +424,16 @@ class _TajweedAyahText extends ConsumerWidget {
   final int? activeWord;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<_TajweedAyahText> createState() => _TajweedAyahTextState();
+}
+
+class _TajweedAyahTextState extends State<_TajweedAyahText>
+    with _WordTapRecognizers {
+  @override
+  Widget build(BuildContext context) {
+    _clearRecognizers();
+    final ayah = widget.ayah;
+    final settings = widget.settings;
     final scheme = Theme.of(context).colorScheme;
     final base = TextStyle(
       fontFamily: 'UthmanicHafs',
@@ -411,9 +448,10 @@ class _TajweedAyahText extends ConsumerWidget {
           TajweedSpan(s.$1, s.$2, s.$3),
       ],
       disabledRules: settings.tajweedDisabledRules.toSet(),
-      activeWord: activeWord,
+      activeWord: widget.activeWord,
       base: base,
       highlightColor: scheme.primaryContainer.withValues(alpha: 0.6),
+      recognizerFor: (pos) => recognizerFor(ayah.surah, ayah.ayah, pos),
     );
     // The tajweed source text already ends with its Arabic ayah number.
     return Text.rich(
@@ -424,8 +462,10 @@ class _TajweedAyahText extends ConsumerWidget {
 }
 
 /// Continuous Arabic text with the currently recited word highlighted.
-/// Tokens from splitting on spaces align with 1-based word positions.
-class _ArabicText extends StatelessWidget {
+/// Tokens from splitting on spaces align with 1-based word positions, so
+/// tapping a word opens its meaning, morphology, and dictionary entry
+/// (except in Warsh, whose numbering doesn't match the word data).
+class _ArabicText extends StatefulWidget {
   const _ArabicText({
     required this.ayah,
     required this.settings,
@@ -437,7 +477,15 @@ class _ArabicText extends StatelessWidget {
   final int? activeWord;
 
   @override
+  State<_ArabicText> createState() => _ArabicTextState();
+}
+
+class _ArabicTextState extends State<_ArabicText> with _WordTapRecognizers {
+  @override
   Widget build(BuildContext context) {
+    _clearRecognizers();
+    final ayah = widget.ayah;
+    final settings = widget.settings;
     final scheme = Theme.of(context).colorScheme;
     final style = TextStyle(
       fontFamily: settings.fontFamily,
@@ -456,7 +504,10 @@ class _ArabicText extends StatelessWidget {
           for (var i = 0; i < tokens.length; i++) ...[
             TextSpan(
               text: tokens[i],
-              style: activeWord == i + 1 ? highlight : style,
+              style: widget.activeWord == i + 1 ? highlight : style,
+              recognizer: settings.isWarsh
+                  ? null
+                  : recognizerFor(ayah.surah, ayah.ayah, i + 1),
             ),
             if (i != tokens.length - 1) TextSpan(text: ' ', style: style),
           ],
