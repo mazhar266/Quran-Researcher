@@ -95,7 +95,13 @@ Pushing a version tag builds and publishes all platforms via GitHub Actions:
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
-Artifacts: Linux `.tar.gz`, Windows `.zip`, Android `.apk`, macOS `.zip` (unsigned), iOS `.ipa` (unsigned, for sideloading). Android is debug-signed unless `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEY_PROPERTIES` secrets are configured.
+Artifacts: Linux `.tar.gz`, Windows `.zip`, Android `.apk`, macOS `.dmg`, iOS `.ipa` (unsigned, for sideloading). Android is debug-signed unless `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEY_PROPERTIES` secrets are configured.
+
+The macOS DMG contains `Quran Researcher.app` and an Applications shortcut. Drag the app to Applications after opening the DMG. If macOS blocks the app on first launch, run:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Quran Researcher.app"
+```
 
 ## Data sources & attribution
 
