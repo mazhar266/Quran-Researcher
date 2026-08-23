@@ -65,8 +65,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  drift_dev: ^2.34.5
-  build_runner: ^2.15.1
+  # No drift_dev/build_runner: the databases are prebuilt by etl/build.py and
+  # accessed with plain SQL via customSelect, so there is no codegen step.
+  # (drift_dev also pins analyzer ^13, which conflicts with flutter_test.)
   flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
