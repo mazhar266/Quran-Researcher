@@ -68,7 +68,11 @@ class AudioController extends Notifier<PlaybackState> {
 
   @override
   PlaybackState build() {
-    _player = AudioPlayer();
+    // Adding a User-Agent helps prevent "(0) source error" from servers that
+    // block generic requests (like everyayah.com).
+    _player = AudioPlayer(
+      userAgent: 'QuranResearcher/1.0 (https://github.com/masrafianam/Quran-Researcher)',
+    );
     ref.onDispose(_player.dispose);
 
     _player.playingStream.listen((playing) {
@@ -138,12 +142,9 @@ class AudioController extends Notifier<PlaybackState> {
   }
 
   AudioSource _source(AyahAudio a, MediaItem tag) {
-    final uri = Uri.parse(a.url);
-    // LockCachingAudioSource keeps a local copy for offline replay (native only).
-    return kIsWeb
-        ? AudioSource.uri(uri, tag: tag)
-        // ignore: experimental_member_use
-        : LockCachingAudioSource(uri, tag: tag);
+    // Switched to standard AudioSource.uri as LockCachingAudioSource often
+    // triggers "(0) source error" if the server's Range support is non-ideal.
+    return AudioSource.uri(Uri.parse(a.url), tag: tag);
   }
 
   void togglePlay() => state.playing ? _player.pause() : _player.play();
