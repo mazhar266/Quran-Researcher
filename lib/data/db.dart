@@ -15,8 +15,23 @@ class AppDatabase extends GeneratedDatabase {
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(onCreate: (_) async {}, onUpgrade: (_, _, _) async {});
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (_) async {},
+        onUpgrade: (_, _, _) async {},
+        beforeOpen: (_) async {
+          // All app databases are prebuilt by the ETL and never written at
+          // runtime, so tune for read-only access:
+          //  - query_only also guards against accidental writes
+          //  - mmap serves pages straight from the OS page cache
+          //  - a 16 MiB page cache covers hot tables (words, ayah_text, FTS)
+          //  - temp_store keeps sort/FTS scratch space off disk
+          // On web (WASM/OPFS) mmap is a harmless no-op; the rest applies.
+          await customStatement('PRAGMA query_only = ON');
+          await customStatement('PRAGMA mmap_size = 268435456');
+          await customStatement('PRAGMA cache_size = -16384');
+          await customStatement('PRAGMA temp_store = MEMORY');
+        },
+      );
 }
 
 final dbProvider = FutureProvider<AppDatabase>((ref) async {
