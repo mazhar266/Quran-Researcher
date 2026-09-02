@@ -210,6 +210,9 @@ CREATE TABLE topics(id INTEGER PRIMARY KEY, name TEXT, arabic_name TEXT,
   parent_id INTEGER, thematic_parent_id INTEGER, ontology_parent_id INTEGER,
   description TEXT, wiki_link TEXT, ayahs TEXT, related_topics TEXT);
 CREATE TABLE surah_info(surah INTEGER PRIMARY KEY, name TEXT, text TEXT);
+CREATE TABLE mushaf_page_text(
+  page INTEGER, surah INTEGER, ayah INTEGER, glyphs TEXT,
+  PRIMARY KEY(page, surah, ayah)) WITHOUT ROWID;
 CREATE TABLE word_grammar(
   surah INTEGER, ayah INTEGER, pos INTEGER, pos_tag TEXT, verb_form INTEGER,
   aspect TEXT, voice TEXT, pgn TEXT, mood TEXT, gcase TEXT, definite INTEGER,
@@ -451,6 +454,19 @@ def build_core():
         con.execute("INSERT INTO surah_info VALUES(?,?,?)",
                     (v["surah_number"], v["surah_name"], v["text"]))
 
+    # Mushaf page text: QPC V4 word glyphs grouped per ayah, keyed by page.
+    v4 = load("mushaf/qpc-v4.json")
+    page_words = {}
+    for k, v in v4.items():
+        s_, a_, p_ = loc_parts(k)
+        page_words.setdefault((s_, a_), []).append((p_, v["text"]))
+    for s_, a_, page in con.execute(
+            "SELECT surah, ayah, page FROM ayahs WHERE page IS NOT NULL").fetchall():
+        words = sorted(page_words.get((s_, a_), []))
+        if words:
+            con.execute("INSERT INTO mushaf_page_text VALUES(?,?,?,?)",
+                        (page, s_, a_, " ".join(t for _, t in words)))
+
     add_grammar(con)
 
     # FTS over primary resources
@@ -570,7 +586,10 @@ def build_dict():
 
 # ------------------------------------------------------------- font packs
 def build_fontpacks():
-    packs = [("fontpack_v1.zip", DATA / "fonts/ttf"),
+    # data/fonts/ttf is the QPC **V4** colour set (QCF4001_COLOR internally) and
+    # pairs with the qpc-v4 word glyphs; "QPC V2 Font.ttf" is the V2 set. There
+    # are no V1 page fonts in this dataset, so nothing renders V1 glyph codes.
+    packs = [("fontpack_v4.zip", DATA / "fonts/ttf"),
              ("fontpack_v2.zip", DATA / "fonts/QPC V2 Font.ttf")]
     paths = []
     for name, srcdir in packs:
@@ -645,6 +664,10 @@ def validate():
            "OR text LIKE '%</rule%' OR text LIKE '%<%'"), 0),
         ("unparsed tajweed markup (word)",
          q("SELECT count(*) FROM words WHERE tajweed_text LIKE '%<%'"), 0),
+        ("mushaf page text rows",
+         q("SELECT count(*) FROM mushaf_page_text"), 6236),
+        ("mushaf pages covered",
+         q("SELECT count(DISTINCT page) FROM mushaf_page_text"), 604),
         ("grammar: words annotated",
          q("SELECT count(*) FROM word_grammar"), None),
         ("grammar: verb lemmas", q("SELECT count(*) FROM verb_lemmas"), None),

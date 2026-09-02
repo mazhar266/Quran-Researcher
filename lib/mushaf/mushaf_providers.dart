@@ -9,9 +9,9 @@ const mushafPageCount = 604;
 
 final _loadedPages = <int>{};
 
-/// Loads the per-page QPC V1 font and returns its family name.
+/// Loads the per-page QPC V4 font and returns its family name.
 final pageFontProvider = FutureProvider.family<String, int>((ref, page) async {
-  final family = 'QPC_P$page';
+  final family = 'QPC_V4_P$page';
   if (_loadedPages.add(page)) {
     try {
       final loader = FontLoader(family)..addFont(pageFontBytes(page));
@@ -39,22 +39,26 @@ class MushafPageAyah {
   });
 }
 
-/// Ayahs on one mushaf page in reading order (QPC V1 glyph codes).
+/// Ayahs on one mushaf page in reading order.
+///
+/// The glyphs are QPC **V4** codes, which is what the shipped per-page fonts
+/// actually encode (their internal name is QCF4001_COLOR). The V1 codes stored
+/// in `ayah_text` have no matching font in this dataset and render as ordinary
+/// Arabic letters through a fallback face.
 final pageAyahsProvider =
     FutureProvider.family<List<MushafPageAyah>, int>((ref, page) async {
   final db = await ref.watch(dbProvider.future);
   final rows = await db.customSelect(
-    "SELECT a.surah, a.ayah, a.juz, t.text FROM ayahs a "
-    "JOIN ayah_text t ON t.surah = a.surah AND t.ayah = a.ayah "
-    "JOIN scripts s ON s.id = t.script_id "
-    "WHERE s.slug = 'qpc-v1-glyph' AND a.page = ?1 ORDER BY a.id",
+    'SELECT m.surah, m.ayah, m.glyphs, a.juz FROM mushaf_page_text m '
+    'JOIN ayahs a ON a.surah = m.surah AND a.ayah = m.ayah '
+    'WHERE m.page = ?1 ORDER BY a.id',
     variables: [Variable.withInt(page)],
   ).get();
   return rows
       .map((r) => MushafPageAyah(
             surah: r.read<int>('surah'),
             ayah: r.read<int>('ayah'),
-            glyphs: r.read<String>('text'),
+            glyphs: r.read<String>('glyphs'),
             juz: r.readNullable<int>('juz'),
           ))
       .toList();

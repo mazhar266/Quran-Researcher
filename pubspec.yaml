@@ -84,7 +84,7 @@ flutter:
 
   assets:
     - assets/db/
-    - assets/fontpack_v1.zip
+    - assets/fontpack_v4.zip
     - assets/icon.png
 
   fonts:

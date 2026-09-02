@@ -9,7 +9,7 @@ Archive? _archive;
 /// the decoded index in memory; individual page fonts decompress on demand.
 Future<ByteData> pageFontBytes(int page) async {
   if (_archive == null) {
-    final data = await rootBundle.load('assets/fontpack_v1.zip');
+    final data = await rootBundle.load('assets/fontpack_v4.zip');
     _archive = ZipDecoder().decodeBytes(Uint8List.view(
         data.buffer, data.offsetInBytes, data.lengthInBytes));
   }

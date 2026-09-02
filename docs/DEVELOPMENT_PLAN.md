@@ -402,3 +402,25 @@ weak root), plus 5 new ETL validation checks.
 
 **Outstanding:** the QAC licence requires the app to show its source and link to
 corpus.quran.com — add this to the attribution screen before release.
+
+
+---
+
+## Fix — mushaf page fonts were paired with the wrong glyph codes
+
+Phase 3 assumed `data/fonts/ttf` held the QPC **V1** page fonts and rendered the
+`qpc-v1-glyph` codes (U+FB50…) with them. It doesn't: those fonts report
+`QCF4001_COLOR` internally and their cmaps only cover **U+FC41…U+FC64** — the
+QPC **V4** range. The dataset ships V2 (`QCF2001`) and V4 page fonts and **no V1
+fonts at all**, so V1 codes fell through to a system fallback and the page
+rendered as loose Arabic letters (ٱ ب ب پ …) instead of mushaf glyphs.
+
+Fix: the ETL now builds `mushaf_page_text` from the **qpc-v4 word glyphs**
+grouped per ayah and keyed by page, and packs the fonts as `fontpack_v4.zip`
+(the V2 set keeps its own name). The app loads those fonts under the family
+`QPC_V4_P<page>` and extracts them to `mushaf_fonts_v4/`, so any earlier wrong
+extraction is not reused. Verified across pages 1, 2, 50, 302, 500 and 604:
+every glyph the page needs is present in that page's font (0 missing).
+
+Guarded by two ETL checks (6,236 page-text rows over 604 pages) and a test
+asserting page glyphs stay inside the V4 range that the shipped fonts encode.

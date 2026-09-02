@@ -136,6 +136,20 @@ void main() {
       }
     });
 
+    test('page glyphs come from the table the shipped V4 fonts can render',
+        () async {
+      final db = await container.read(dbProvider.future);
+      final rows = await db.customSelect(
+          'SELECT glyphs FROM mushaf_page_text WHERE page = 1').get();
+      expect(rows, isNotEmpty);
+      // QPC V4 glyph codes live in U+FC00..U+FDFF; the V1 codes (U+FB50..)
+      // have no font in this dataset and would fall back to plain letters.
+      final cps = rows
+          .expand((r) => r.read<String>('glyphs').runes)
+          .where((c) => c > 0x600);
+      expect(cps.every((c) => c >= 0xFC00 && c <= 0xFDFF), isTrue);
+    });
+
     test('mushaf page 1 is Al-Fatihah, page 604 ends the mushaf', () async {
       final p1 = await container.read(pageAyahsProvider(1).future);
       expect(p1.length, 7);
@@ -159,7 +173,7 @@ void main() {
   });
 
   test('fontpack asset holds all 604 page fonts', () {
-    final bytes = File('assets/fontpack_v1.zip').readAsBytesSync();
+    final bytes = File('assets/fontpack_v4.zip').readAsBytesSync();
     final archive = ZipDecoder().decodeBytes(bytes);
     final names = archive.files.map((f) => f.name).toSet();
     for (final page in [1, 302, 604]) {
