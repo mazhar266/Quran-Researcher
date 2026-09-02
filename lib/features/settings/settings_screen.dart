@@ -107,6 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                       ReadingTheme.light => context.l10n.themeLight,
                       ReadingTheme.dark => context.l10n.themeDark,
                       ReadingTheme.sepia => context.l10n.themeSepia,
+                      ReadingTheme.oled => context.l10n.themeOled,
                     }),
                   ),
               ],

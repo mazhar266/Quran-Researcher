@@ -14,7 +14,7 @@ Bilingual by design: English and Bengali (বাংলা) — UI, translations,
 - **Mushaf page mode** — all 604 pages in the authentic KFGQPC V4 per-page fonts, with colour ayah markers on light backgrounds and theme-coloured text in dark mode, swiped right-to-left like a physical mushaf
 - **Word-by-word** interlinear English + Bangla glosses, transliteration, footnoted Sahih International
 - **Warsh riwayah** as a script option (Arabic-only, with its own ayah numbering)
-- Navigation by surah, juz, or page · bookmarks · continue-where-you-left-off · light/dark/sepia themes
+- Navigation by surah, juz, or page · bookmarks · continue-where-you-left-off · light / dark / sepia / true-black (OLED) themes
 
 ### Listen
 - Two reciters (Mishari Rashid al-Afasy, Mahmoud Khalil al-Husary), streamed and cached for offline replay

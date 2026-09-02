@@ -446,3 +446,25 @@ Covered by four tests: the shipped font really is a colour font, stripping
 removes only COLR/CPAL while keeping `glyf`/`loca`/`cmap`, the rewritten sfnt
 stays structurally valid (version, searchRange/entrySelector, 4-byte-aligned
 in-bounds tables), and a font with no colour tables is returned untouched.
+
+
+---
+
+## Addition — true-black (OLED) theme
+
+A fourth reading theme paints pure #000000 surfaces: on an OLED panel those
+pixels are switched off, so it saves power and removes the dark theme's grey
+halo in a dark room. Material's elevation overlays are dropped (a "raised"
+surface tinted grey would defeat the point) and hairline `outlineVariant`
+borders separate surfaces instead; sheets, dialogs and cards sit on #0A0A0A so
+they read as layers without glowing.
+
+It reports `Brightness.dark`, so the mushaf's colour-table stripping applies
+and page glyphs take the theme's text colour. The settings screen builds its
+list from `ReadingTheme.values`, so the option appeared without touching that
+code; only the localized label (EN + বাংলা) was added.
+
+Covered by five tests: every theme resolves, OLED is true black where the
+ordinary dark theme deliberately is not, it reports dark brightness (the mushaf
+mono-font trigger), its text/accent/divider colours stay legible on black, and
+light and sepia stay light so they keep the colour mushaf font.

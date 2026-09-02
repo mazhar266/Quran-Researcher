@@ -48,6 +48,7 @@
   "sectionTheme": "Theme",
   "themeLight": "Light",
   "themeDark": "Dark",
+  "themeOled": "True black (OLED)",
   "themeSepia": "Sepia (paper)",
   "sectionLanguage": "App language",
   "langSystem": "System default",

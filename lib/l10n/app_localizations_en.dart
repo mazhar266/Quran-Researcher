@@ -151,6 +151,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDark => 'Dark';
 
   @override
+  String get themeOled => 'True black (OLED)';
+
+  @override
   String get themeSepia => 'Sepia (paper)';
 
   @override

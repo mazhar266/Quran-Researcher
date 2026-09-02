@@ -150,6 +150,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get themeDark => 'অন্ধকার';
 
   @override
+  String get themeOled => 'নিকষ কালো (OLED)';
+
+  @override
   String get themeSepia => 'সেপিয়া (কাগজ)';
 
   @override

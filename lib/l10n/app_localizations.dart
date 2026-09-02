@@ -350,6 +350,12 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get themeDark;
 
+  /// No description provided for @themeOled.
+  ///
+  /// In en, this message translates to:
+  /// **'True black (OLED)'**
+  String get themeOled;
+
   /// No description provided for @themeSepia.
   ///
   /// In en, this message translates to:
