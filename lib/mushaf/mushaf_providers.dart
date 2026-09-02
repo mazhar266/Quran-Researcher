@@ -3,21 +3,29 @@ import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/db.dart';
+import 'font_mono.dart';
 import 'page_fonts_web.dart' if (dart.library.ffi) 'page_fonts_native.dart';
 
 const mushafPageCount = 604;
 
-final _loadedPages = <int>{};
+final _loadedFamilies = <String>{};
 
 /// Loads the per-page QPC V4 font and returns its family name.
-final pageFontProvider = FutureProvider.family<String, int>((ref, page) async {
-  final family = 'QPC_V4_P$page';
-  if (_loadedPages.add(page)) {
+///
+/// [mono] strips the font's colour tables so the glyphs take the theme's text
+/// colour — needed on dark backgrounds, where the baked-in black is invisible.
+final pageFontProvider =
+    FutureProvider.family<String, ({int page, bool mono})>((ref, key) async {
+  final family = 'QPC_V4${key.mono ? '_MONO' : ''}_P${key.page}';
+  if (_loadedFamilies.add(family)) {
     try {
-      final loader = FontLoader(family)..addFont(pageFontBytes(page));
+      final loader = FontLoader(family)
+        ..addFont(key.mono
+            ? pageFontBytes(key.page).then(stripColourTables)
+            : pageFontBytes(key.page));
       await loader.load();
     } catch (e) {
-      _loadedPages.remove(page);
+      _loadedFamilies.remove(family);
       rethrow;
     }
   }

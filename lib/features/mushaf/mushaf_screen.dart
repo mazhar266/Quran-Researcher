@@ -38,9 +38,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   @override
   Widget build(BuildContext context) {
     // Preload neighbouring page fonts so swipes don't flash fallback glyphs.
+    final mono = Theme.of(context).brightness == Brightness.dark;
     for (final p in [_page - 1, _page + 1]) {
       if (p >= 1 && p <= mushafPageCount) {
-        ref.listen(pageFontProvider(p), (_, _) {});
+        ref.listen(pageFontProvider((page: p, mono: mono)), (_, _) {});
       }
     }
     final juz =
@@ -152,7 +153,8 @@ class _MushafPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final font = ref.watch(pageFontProvider(page));
+    final mono = Theme.of(context).brightness == Brightness.dark;
+    final font = ref.watch(pageFontProvider((page: page, mono: mono)));
     final ayahs = ref.watch(pageAyahsProvider(page));
     final surahs = ref.watch(surahsProvider).value;
     final scheme = Theme.of(context).colorScheme;

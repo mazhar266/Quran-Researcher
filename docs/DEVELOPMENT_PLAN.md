@@ -424,3 +424,25 @@ every glyph the page needs is present in that page's font (0 missing).
 
 Guarded by two ETL checks (6,236 page-text rows over 604 pages) and a test
 asserting page glyphs stay inside the V4 range that the shipped fonts encode.
+
+
+---
+
+## Fix — mushaf text invisible in dark theme
+
+The KFGQPC V4 page fonts are COLR/CPAL **colour** fonts: each glyph carries a
+baked-in palette (black text, coloured ayah markers), so `TextStyle.color` is
+ignored and the page stayed black-on-black in the dark theme.
+
+Flutter cannot select a CPAL palette, and shipping a second monochrome pack
+would double the 69 MB asset. Instead `lib/mushaf/font_mono.dart` rewrites the
+sfnt table directory at load time to drop COLR and CPAL, which makes the
+renderer fall back to each glyph's plain `glyf` outline — and those *do* take
+the requested colour. The mushaf loads the colour font on light and sepia
+backgrounds and the stripped one under a dark theme, cached separately as
+`QPC_V4_P<page>` and `QPC_V4_MONO_P<page>`.
+
+Covered by four tests: the shipped font really is a colour font, stripping
+removes only COLR/CPAL while keeping `glyf`/`loca`/`cmap`, the rewritten sfnt
+stays structurally valid (version, searchRange/entrySelector, 4-byte-aligned
+in-bounds tables), and a font with no colour tables is returned untouched.
