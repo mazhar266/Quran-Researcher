@@ -28,7 +28,8 @@ Bilingual by design: English and Bengali (বাংলা) — UI, translations,
 - Full-text search across Arabic, English, Bangla, and transliteration
 
 ### Research
-- **Tap any word** → its meaning, root, lemma, stem, and classical dictionary entry
+- **Tap any word** → its meaning, full **sarf** analysis (bab, sigah, masdar, i'rab), root, lemma, stem, and classical dictionary entry
+- **Sarf (صرف)** — verb form I–X with its traditional **bab** (باب نصر / ضرب / فتح / سمع …), **sigah** (মাযী মা'রূফ · ওয়াহিদ মুযাক্কার গায়েব), **masdar**, voice, mood and case — in English and Bengali madrasa terminology
 - **Root explorer** — 1,642 trilateral roots with every occurrence in the corpus (50,298 word–root links)
 - **Arramooz dictionary** — 30,213 nouns and 10,637 verbs with wazn, plurals, and Arabic definitions
 - **Similar-ayah navigation** with match ranges highlighted
@@ -109,6 +110,7 @@ xattr -dr com.apple.quarantine "/Applications/Quran Researcher.app"
 |---|---|---|
 | [Quranic Universal Library](https://qul.tarteel.ai) (Tarteel) | Quran text in all scripts, translations, tafsirs, morphology, audio timings, page fonts, metadata | Per-resource attribution required |
 | [Arramooz Alwaseet](https://github.com/linuxscout/arramooz) (Taha Zerrouki) | Classical Arabic morphological dictionary | GPL |
+| [Quranic Arabic Corpus](https://corpus.quran.com) (Kais Dukes) | Word-by-word grammar: part of speech, verb form, aspect, voice, person/gender/number, mood, case | GPL — **attribution and a link to corpus.quran.com are required in-app** |
 | King Fahd Glorious Quran Printing Complex (via QUL) | KFGQPC fonts (Hafs, Warsh, page fonts) | Per KFGQPC terms |
 | [audio-cdn.tarteel.ai](https://qul.tarteel.ai) | Recitation MP3 streams | Streamed at runtime |
 

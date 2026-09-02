@@ -367,3 +367,38 @@ PWA with the app icons.
 - **Dictionary coverage** — ~36% of Arramooz nouns have no definition and all
   definitions are Arabic-only; the word-by-word EN/BN glosses remain the
   primary meaning source, with Arramooz as the advanced/Arabic layer.
+
+
+---
+
+## Phase 6 — Sarf (morphology) layer ✅ DONE
+
+Word-by-word meaning previously stopped at root/lemma/stem. It now carries a
+full traditional analysis, from the **Quranic Arabic Corpus** morphology
+(Kais Dukes, GPL — vendored at `data/grammar/`, attribution required):
+
+* **Word type** — ism / fi'l / harf, plus ism fā'il, ism maf'ūl, masdar, proper noun.
+* **Bab (باب)** — deterministic for forms II–X (تفعيل، مفاعلة، إفعال …); for form I
+  derived from the ʿayn vowels of the past and present, read from the Quran's own
+  vocalised forms, from Arramooz's `future_type`, and — for hollow verbs, whose
+  vowel hides inside a long vowel — from the classical rule on the present's first
+  radical (يَقُولُ → naṣara, يَبِيعُ → ḍaraba, يَخَافُ → samiʿa).
+  **93% of verb words** in the Quran resolve a bab; the rest show nothing rather
+  than a guess.
+* **Sigah (صيغة)** — tense (māḍī / muḍāriʿ / amr), voice (maʿrūf / majhūl) and
+  person-gender-number, in Arabic with English and Bengali madrasa terminology.
+* **Masdar (مصدر)** — Arramooz's explicit verb→masdar link first (so آمَنَ → إيمان
+  and أَقامَ → إقامة, both irregular); template instantiation only for *sound* roots,
+  where it is safe; otherwise omitted.
+* **I'rab** — mood for verbs (marfū' / manṣūb / majzūm), case for nouns.
+
+Alignment: QAC annotates segments and numbers words slightly differently from
+QUL (which counts the ayah-number glyph, and splits بعدما). Words are matched by
+letter-only text and **99%** align; unverified positions get no grammar at all.
+
+Verified: 45 tests (8 new covering form/aspect/voice/pgn/mood, passive
+detection, hollow-verb babs, and that no malformed template masdar reaches a
+weak root), plus 5 new ETL validation checks.
+
+**Outstanding:** the QAC licence requires the app to show its source and link to
+corpus.quran.com — add this to the attribution screen before release.

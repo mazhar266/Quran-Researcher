@@ -24,6 +24,8 @@ import sys
 import zipfile
 from pathlib import Path
 
+import grammar
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 BUILD = ROOT / "dist"
@@ -208,6 +210,16 @@ CREATE TABLE topics(id INTEGER PRIMARY KEY, name TEXT, arabic_name TEXT,
   parent_id INTEGER, thematic_parent_id INTEGER, ontology_parent_id INTEGER,
   description TEXT, wiki_link TEXT, ayahs TEXT, related_topics TEXT);
 CREATE TABLE surah_info(surah INTEGER PRIMARY KEY, name TEXT, text TEXT);
+CREATE TABLE word_grammar(
+  surah INTEGER, ayah INTEGER, pos INTEGER, pos_tag TEXT, verb_form INTEGER,
+  aspect TEXT, voice TEXT, pgn TEXT, mood TEXT, gcase TEXT, definite INTEGER,
+  special TEXT, root TEXT, lemma TEXT, prefixes TEXT, suffixes TEXT,
+  PRIMARY KEY(surah, ayah, pos)) WITHOUT ROWID;
+CREATE TABLE verb_lemmas(
+  id INTEGER PRIMARY KEY, lemma TEXT, root TEXT, verb_form INTEGER,
+  bab_ar TEXT, bab_key TEXT, masdar TEXT, masdar_source TEXT, source TEXT,
+  occurrences INTEGER);
+CREATE INDEX idx_verb_lemma ON verb_lemmas(lemma, root);
 CREATE VIRTUAL TABLE fts_ayah USING fts5(
   verse_key UNINDEXED, ar_simple, tr_en, tr_bn, translit,
   tokenize='unicode61 remove_diacritics 2');
@@ -225,6 +237,65 @@ def section_lookup(meta_file, number_field):
             for ayah in range(int(a), int(b or a) + 1):
                 lookup[(int(s), ayah)] = num
     return lookup
+
+
+
+def add_grammar(con):
+    """Sarf layer: align QAC morphology to QUL words, derive bab + masdar."""
+    words = grammar.parse_corpus(DATA / "grammar/quran-morphology.txt")
+
+    # Arramooz supplies form-I present vowels and samāʿī masdars.
+    import sqlite3 as _sq
+    ar = _sq.connect(DATA / "arramooz/data/arabicdictionary.sqlite")
+    verbs = {}
+    for voc, root, ft in ar.execute("SELECT vocalized, root, future_type FROM verbs"):
+        verbs.setdefault(grammar._norm(root or ""), []).append((voc or "", ft or ""))
+    masdars = {"strict": {}, "loose": {}}
+    for voc, orig in ar.execute(
+            "SELECT vocalized, original FROM nouns "
+            "WHERE wordtype LIKE '%مصدر%' AND original != ''"):
+        masdars["strict"].setdefault(grammar.strict_key(orig), []).append(voc)
+        masdars["loose"].setdefault(grammar._norm(orig), []).append(voc)
+    ar.close()
+
+    # Word-level grammar, aligned per ayah and verified by text.
+    by_ayah = {}
+    for (s, a, w), segs in words.items():
+        by_ayah.setdefault((s, a), {})[w] = segs
+    matched = total = 0
+    for (s, a), qac in sorted(by_ayah.items()):
+        qul = [(p, t) for p, t in con.execute(
+            "SELECT pos, text_qpc_hafs FROM words WHERE surah=?1 AND ayah=?2 "
+            "ORDER BY pos", (s, a))]
+        total += len([1 for _, t in qul if any(c.isalpha() for c in grammar._strip(t))])
+        aligned = grammar.align(qul, [qac[i] for i in sorted(qac)])
+        for pos, segs in aligned.items():
+            stem = next((x for x in segs if "PREF" not in x["tags"]
+                         and "SUFF" not in x["tags"]), segs[0])
+            aspect, voice, pgn, mood = grammar.sigah(stem)
+            special = next((t for t in stem["tags"]
+                            if t in ("ACT_PCPL", "PASS_PCPL", "VN", "ADJ", "PN")), None)
+            con.execute(
+                "INSERT OR REPLACE INTO word_grammar VALUES"
+                "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (s, a, pos, stem["pos"], int(stem["kv"].get("VF", 0)) or None,
+                 aspect, voice, pgn, mood,
+                 next((t for t in stem["tags"] if t in ("NOM", "ACC", "GEN")), None),
+                 0 if "INDEF" in stem["tags"] else (1 if stem["pos"] == "N" else None),
+                 special, stem["kv"].get("ROOT"), stem["kv"].get("LEM"),
+                 json.dumps([x["text"] for x in segs if "PREF" in x["tags"]],
+                            ensure_ascii=False) or None,
+                 json.dumps([x["text"] for x in segs if "SUFF" in x["tags"]],
+                            ensure_ascii=False) or None))
+            matched += 1
+
+    for i, row in enumerate(grammar.verb_lemmas(words, verbs, masdars), 1):
+        con.execute("INSERT INTO verb_lemmas VALUES(?,?,?,?,?,?,?,?,?,?)",
+                    (i, row["lemma"], row["root"], row["verb_form"], row["bab_ar"],
+                     row["bab_key"], row["masdar"], row["masdar_source"],
+                     row["source"], row["occurrences"]))
+    print(f"    grammar: {matched}/{total} words aligned "
+          f"({matched * 100 // max(total, 1)}%)")
 
 
 def build_core():
@@ -380,6 +451,8 @@ def build_core():
         con.execute("INSERT INTO surah_info VALUES(?,?,?)",
                     (v["surah_number"], v["surah_name"], v["text"]))
 
+    add_grammar(con)
+
     # FTS over primary resources
     con.execute("""
       INSERT INTO fts_ayah(verse_key, ar_simple, tr_en, tr_bn, translit)
@@ -512,7 +585,8 @@ def build_fontpacks():
 
 # --------------------------------------------------------------- manifest
 ATTRIBUTION = {
-    "core": "Quranic Universal Library (qul.tarteel.ai)",
+    "core": "Quranic Universal Library (qul.tarteel.ai); grammar from the "
+            "Quranic Arabic Corpus (corpus.quran.com, Kais Dukes, GPL)",
     "scripts_extra": "Quranic Universal Library (qul.tarteel.ai)",
     "tafsir": "Quranic Universal Library (qul.tarteel.ai); see book for author",
     "audio": "Quranic Universal Library / audio-cdn.tarteel.ai",
@@ -571,6 +645,20 @@ def validate():
            "OR text LIKE '%</rule%' OR text LIKE '%<%'"), 0),
         ("unparsed tajweed markup (word)",
          q("SELECT count(*) FROM words WHERE tajweed_text LIKE '%<%'"), 0),
+        ("grammar: words annotated",
+         q("SELECT count(*) FROM word_grammar"), None),
+        ("grammar: verb lemmas", q("SELECT count(*) FROM verb_lemmas"), None),
+        ("grammar: forms II-X all have a bab",
+         q("SELECT count(*) FROM verb_lemmas WHERE verb_form BETWEEN 2 AND 10 "
+           "AND bab_ar IS NULL"), 0),
+        ("grammar: verb words showing a bab (%)",
+         q("SELECT 100 * (SELECT count(*) FROM word_grammar g JOIN verb_lemmas v"
+           "  ON v.lemma=g.lemma AND v.root=g.root"
+           " WHERE g.pos_tag='V' AND v.bab_ar IS NOT NULL)"
+           " / (SELECT count(*) FROM word_grammar WHERE pos_tag='V')"), None),
+        ("grammar: no template masdar on hamzated roots",
+         q("SELECT count(*) FROM verb_lemmas WHERE masdar_source='pattern' "
+           "AND (masdar LIKE '%أ%' OR masdar LIKE '%ؤ%' OR masdar LIKE '%ئ%')"), 0),
     ]
     ok = True
     for name, got, want in checks:

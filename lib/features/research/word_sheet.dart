@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/research_repo.dart';
+import 'sarf_section.dart';
 import 'widgets.dart';
 
 /// Tap-a-word sheet: morphology (root/lemma/stem) + the Arramooz dictionary.
@@ -62,7 +63,11 @@ class _WordSheet extends ConsumerWidget {
                 ],
               ),
             ),
-            const SectionLabel('Morphology'),
+            SarfSection(
+              location: location,
+              bangla: Localizations.localeOf(context).languageCode == 'bn',
+            ),
+            const SectionLabel('Root, lemma & stem'),
             ListTile(
               dense: true,
               leading: const Icon(Icons.account_tree_outlined),
