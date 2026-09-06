@@ -11,9 +11,10 @@ void main() {
   test('About screen version matches pubspec.yaml', () {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     final match =
-        RegExp(r'^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$', multiLine: true)
+        RegExp(r'^version:\s*(\d+\.\d+\.\d+)(?:\+(\d+))?\s*$', multiLine: true)
             .firstMatch(pubspec);
-    expect(match, isNotNull, reason: 'pubspec.yaml needs a "x.y.z+build" version');
+    expect(match, isNotNull,
+        reason: 'pubspec.yaml needs an "x.y.z" version (build number optional)');
     expect(AboutScreen.version, match!.group(1));
   });
 }

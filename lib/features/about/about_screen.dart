@@ -8,7 +8,7 @@ class AboutScreen extends StatelessWidget {
 
   /// The app's release version. Kept in step with `version:` in pubspec.yaml,
   /// which test/version_test.dart asserts.
-  static const version = '2.1.1';
+  static const version = '2.1.2';
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class AboutScreen extends StatelessWidget {
       ),
       (
         name: 'Fonts — King Fahd Glorious Quran Printing Complex (KFGQPC)',
-        detail: 'UthmanicHafs V22, the 604 QPC V1 per-page mushaf fonts, '
+        detail: 'UthmanicHafs V22, the 604 QPC V4 per-page mushaf fonts, '
             'KFGQPC Nastaleeq, and the Warsh face, obtained via QUL.',
       ),
       (
@@ -39,6 +39,14 @@ class AboutScreen extends StatelessWidget {
         detail: 'Open-source Arabic morphological dictionary '
             '(github.com/linuxscout/arramooz), GPL-licensed. Used for the '
             'root dictionary entries in the research layer.',
+      ),
+      (
+        name: 'Quranic Arabic Corpus — Kais Dukes',
+        detail: 'Word-by-word grammar (part of speech, verb form, aspect, '
+            'voice, person/gender/number, mood and case) from the Quranic '
+            'Arabic Corpus, corpus.quran.com — GNU General Public License. '
+            'The sarf analysis, including the bab and sigah of every verb, '
+            'is derived from this annotation.',
       ),
       (
         name: 'Translations & tafsir',
