@@ -1,4 +1,4 @@
-package research.quran.mazhar.fi
+package fi.mazhar.quran.researcher
 
 import com.ryanheise.audioservice.AudioServiceFragmentActivity
 

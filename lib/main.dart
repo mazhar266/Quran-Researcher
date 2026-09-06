@@ -19,7 +19,7 @@ Future<void> main() async {
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     // Lock-screen / notification controls and background playback on mobile.
     await JustAudioBackground.init(
-      androidNotificationChannelId: 'research.quran.mazhar.fi.audio',
+      androidNotificationChannelId: 'fi.mazhar.quran.researcher.audio',
       androidNotificationChannelName: 'Recitation playback',
       androidNotificationOngoing: true,
     );

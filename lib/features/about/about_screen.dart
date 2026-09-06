@@ -6,7 +6,9 @@ import '../../l10n/l10n.dart';
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
-  static const _version = '1.0.0';
+  /// The app's release version. Kept in step with `version:` in pubspec.yaml,
+  /// which test/version_test.dart asserts.
+  static const version = '2.1.1';
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,7 @@ class AboutScreen extends StatelessWidget {
                 children: [
                   Text(context.l10n.appTitle,
                       style: Theme.of(context).textTheme.titleLarge),
-                  Text('v$_version',
+                  Text('v$version',
                       style: TextStyle(color: scheme.onSurfaceVariant)),
                 ],
               ),
@@ -93,7 +95,7 @@ class AboutScreen extends StatelessWidget {
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'Quran Researcher',
-              applicationVersion: _version,
+              applicationVersion: version,
             ),
           ),
         ],

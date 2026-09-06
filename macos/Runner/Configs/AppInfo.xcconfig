@@ -8,7 +8,7 @@
 PRODUCT_NAME = Quran Researcher
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = research.quran.mazhar.fi
+PRODUCT_BUNDLE_IDENTIFIER = fi.mazhar.quran.researcher
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 Mazhar Ahmed. All rights reserved.

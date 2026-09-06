@@ -16,7 +16,7 @@ val keystoreProperties = Properties().apply {
 val hasReleaseKeys = keystoreProperties.getProperty("storeFile") != null
 
 android {
-    namespace = "research.quran.mazhar.fi"
+    namespace = "fi.mazhar.quran.researcher"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -26,7 +26,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "research.quran.mazhar.fi"
+        applicationId = "fi.mazhar.quran.researcher"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

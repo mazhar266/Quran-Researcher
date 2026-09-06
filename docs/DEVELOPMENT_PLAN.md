@@ -27,7 +27,7 @@ quran research/
 │   └── transliteration/   # simple, tajweed, syllable-level
 ├── docs/                  # this document
 └── (Flutter app "Quran Researcher" at root — Dart package quran_app,
-     app id research.quran.mazhar.fi on every platform)
+     app id fi.mazhar.quran.researcher on every platform)
 ```
 
 **Data quirk:** most `*.json` / `*.db` entries under `data/` are actually *directories*
@@ -202,7 +202,7 @@ column added for joining against QUL roots.
 self-validation report (18 checks: entity counts, section coverage, FTS spot
 check, dictionary root join — 1,547 of 1,642 QUL roots have Arramooz entries).
 Flutter app scaffolded for all six platforms as `quran_app`
-(app id `research.quran.mazhar.fi`, display name "Quran Researcher") with flutter_riverpod,
+(app id `fi.mazhar.quran.researcher`, display name "Quran Researcher") with flutter_riverpod,
 go_router, drift (+sqlite3 libs), a light/dark/sepia theme system, and a
 passing boot test. `data/` stays out of pubspec assets — it is ETL input only;
 `dist/` is gitignored (regenerable).
@@ -468,3 +468,20 @@ Covered by five tests: every theme resolves, OLED is true black where the
 ordinary dark theme deliberately is not, it reports dark brightness (the mushaf
 mono-font trigger), its text/accent/divider colours stay legible on black, and
 light and sepia stay light so they keep the colour mushaf font.
+
+
+---
+
+## Change — application id is now `fi.mazhar.quran.researcher`
+
+The id was `research.quran.mazhar.fi`, which reads the domain backwards.
+Reverse-DNS puts the domain first: `mazhar.fi` -> `fi.mazhar`, then the product.
+Updated in the Android namespace/applicationId (and the Kotlin package
+directory), the iOS and macOS bundle identifiers, the Linux GTK application id,
+and the just_audio notification channel id.
+
+Consequence: the id keys per-user storage, so the app looks at a new directory
+(`~/.local/share/fi.mazhar.quran.researcher` on Linux). Bundled databases and
+the extracted mushaf fonts simply regenerate; `shared_preferences.json`
+(bookmarks, last-read, settings) does not, so copy it across when changing the
+id. On Android the new id installs as a separate app — uninstall the old one.
