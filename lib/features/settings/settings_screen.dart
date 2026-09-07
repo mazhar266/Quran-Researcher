@@ -177,7 +177,17 @@ void _showTajweedLegend(BuildContext context) {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  title: Text(rule.label),
+                  title: Text.rich(TextSpan(children: [
+                    TextSpan(
+                      text: rule.arabic,
+                      style: const TextStyle(
+                          fontFamily: 'UthmanicHafs', fontSize: 17),
+                    ),
+                    TextSpan(text: '  ${rule.label}'),
+                  ])),
+                  subtitle: rule.harakat == null
+                      ? null
+                      : Text('${rule.harakat} ḥarakāt'),
                   value: !disabled.contains(rule.slug),
                   onChanged: (on) => notifier.update((s) {
                     final set = s.tajweedDisabledRules.toSet();

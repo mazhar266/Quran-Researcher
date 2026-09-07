@@ -14,7 +14,14 @@ final sharedPrefsProvider =
 const readerScripts = [
   (slug: 'uthmani', family: 'UthmanicHafs', label: 'Uthmani'),
   (slug: 'qpc-hafs', family: 'UthmanicHafs', label: 'Uthmani (QPC Hafs)'),
-  (slug: 'indopak-nastaleeq', family: 'IndoPakNastaleeq', label: 'IndoPak Nastaleeq'),
+  (
+    slug: 'digital-khatt-indopak',
+    family: 'DigitalKhattIndoPak',
+    label: 'IndoPak (Digital Khatt)',
+  ),
+  // Each codepoint here is a pre-composed glyph, so marks can never detach
+  // from their letter however the text is split for colouring.
+  (slug: 'hafs-smart', family: 'HafsSmart', label: 'Hafs Smart (15-line)'),
   (slug: 'warsh', family: 'UthmanicWarsh', label: "Warsh (qira'at)"),
 ];
 
@@ -100,8 +107,14 @@ class Settings {
         'lang': appLanguage,
       };
 
+  /// A script that is no longer offered — indopak-nastaleeq was dropped
+  /// because its private-use encoding has no font here — must not survive in
+  /// saved settings, or the reader would render tofu boxes.
+  static String _knownScript(String? slug) =>
+      readerScripts.any((s) => s.slug == slug) ? slug! : 'qpc-hafs';
+
   factory Settings.fromJson(Map<String, dynamic> j) => Settings(
-        scriptSlug: j['script'] as String? ?? 'qpc-hafs',
+        scriptSlug: _knownScript(j['script'] as String?),
         translationSlugs: (j['translations'] as List?)?.cast<String>() ??
             const ['en-sahih-international', 'bn-taisirul-quran'],
         wordByWord: j['wbw'] as bool? ?? false,

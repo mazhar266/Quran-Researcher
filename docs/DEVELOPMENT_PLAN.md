@@ -514,3 +514,91 @@ start ayahs (juz 2 at 2:142, the seven manzils at 1:1, 5:1, 10:1, 17:1, 26:1,
 (including an ayah that opens a rukuʿ only, and mid-division ayahs marking
 nothing), the 15 sajdahs with 4 obligatory, and an ayah reporting every
 division it sits inside.
+
+
+---
+
+## Fix — IndoPak script was unrenderable, and one HTML entity leaked into 32:3
+
+Two problems surfaced from a reader asking why the madd sign (the ~ over
+أُولَـٰٓئِكَ) was not visible.
+
+**The madd itself was fine.** 2:5 carries `madda_obligatory_mottasel` on both
+occurrences and the renderer colours it; KFGQPC Hafs simply draws the mark
+subtly. What was missing was the *information*: nothing named the rule or said
+how long to hold it. The word sheet now lists the tajweed rules inside a word
+with their Arabic and Bengali names and their ḥarakāt count (2 / 4-5 / 6), and
+the settings legend shows the same.
+
+**IndoPak Nastaleeq could only ever render as boxes.** Its text is encoded in a
+private-use area (U+F500…) and needs **346** codepoints that
+`KFGQPCNastaleeq-Regular.ttf` does not contain — no font in the dataset covers
+it (the closest misses 356). It is replaced by **Digital Khatt IndoPak**, whose
+font pairs with the `digital-khatt-indopak` text with nothing missing but an
+invisible bidi control — and which draws the madd prominently. Saved settings
+naming the removed script fall back to a working one, or the reader would still
+show boxes for anyone who had selected it.
+
+**32:3 contained `&gt;`.** QUL's tajweed export has exactly one stray HTML
+entity, which landed in the Quranic text as literal ASCII. The ETL now strips
+entities before tokenizing (afterwards would shift the span offsets), and a new
+validation check fails the build if any ASCII survives in tajweed text.
+
+Guarded by a test that reads each shipped font's cmap and asserts it covers the
+madd marks the scripts rely on — the same class of bug as the mushaf's V1/V4
+font mismatch, now caught in the suite rather than on screen.
+
+
+---
+
+## Addition — Hafs Smart script and the 15-line mushaf layout
+
+`data/hafs_smart_v8.json` + `hafssmart.8.ttf` add two things the project did
+not have.
+
+**A script whose glyphs cannot come apart.** Its text is encoded entirely in
+the Private Use Area: one codepoint per pre-composed cluster (2,598 distinct
+glyphs, all present in the shipped font). Because a letter and its marks are a
+single glyph, splitting the text into coloured spans cannot detach a maddah
+from its letter — the failure mode that makes marks fragile in the
+mark-and-base encodings. Offered in the reader as "Hafs Smart (15-line)".
+
+**The line layout that Phase 3 lacked.** Every ayah carries its page and the
+line range it occupies, 1..15 across all 604 pages, now in `mushaf_layout`.
+Its page numbers agree with the existing V1-derived pages for 6,180 of 6,236
+ayahs; the rest are ayahs straddling a page break, where editions differ by
+one. Note this is *ayah*-level: only 28% of ayahs fit on a single line, so it
+does not by itself say where to break a multi-line ayah — full line-accurate
+page rendering still needs per-word line assignment.
+
+Also fixed here: the ETL's script-count checks hardcoded 8 ayah scripts and
+49,888 rows, so adding a script failed them; they now derive both.
+
+Six tests cover the script's coverage, its all-PUA encoding, the font drawing
+every glyph used, its registration in the reader, and the layout's shape
+(6,236 rows, 604 pages, lines within 1..15, ordered ranges, page agreement).
+
+
+---
+
+## Fix — tajweed colouring dropped the madd mark (2:5)
+
+With colouring on, the maddah over أُولَـٰٓئِكَ disappeared. The tajweed helper
+was not deleting it: every character survives (verified across all 6,236
+ayahs, and the spans reassemble the source exactly). The loss happened at
+*shaping* time. The engine shapes each `TextSpan` as its own run, and the madd
+span began at the tatweel that carries the mark while its base letter ل sat in
+the previous run — so the mark cluster was shaped orphaned and stopped being
+drawn.
+
+`buildTajweedSpans` now widens every rule span to whole letter-plus-marks
+clusters before cutting: the start moves back onto its base letter, the end
+past any trailing marks. The لام is therefore coloured along with its madd,
+which is also how a printed mushaf marks it. Standalone Quranic symbols —
+U+06DD end of ayah, U+06DE ۞ rubʿ al-hizb, U+06E9 place of sajdah — are
+excluded from the mark set, since they legitimately open a run.
+
+Guarded by a corpus-wide invariant (no run in the entire mushaf begins with a
+combining mark, and colouring never alters the text), a check that 2:5's madd
+run carries its لام and its ٓ, and a golden rendered through the real text
+engine so the mark's loss would reappear as a visual diff.

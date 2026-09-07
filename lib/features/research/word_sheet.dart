@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../data/research_repo.dart';
 import 'sarf_section.dart';
+import 'tajweed_section.dart';
 import 'widgets.dart';
 
 /// Tap-a-word sheet: morphology (root/lemma/stem) + the Arramooz dictionary.
@@ -64,6 +65,10 @@ class _WordSheet extends ConsumerWidget {
               ),
             ),
             SarfSection(
+              location: location,
+              bangla: Localizations.localeOf(context).languageCode == 'bn',
+            ),
+            TajweedSection(
               location: location,
               bangla: Localizations.localeOf(context).languageCode == 'bn',
             ),

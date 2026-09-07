@@ -61,11 +61,17 @@ def key_parts(verse_key):
 # tooltip attribute in the source data).
 TAG_RE = re.compile(r"<rule class=['\"]?([a-z_0-9]+)['\"]?[^>]*>|</rule>")
 
+# QUL's tajweed export contains one stray HTML entity (&gt; inside 32:3).
+# No entity is ever legitimate Quranic text, so drop them before tokenizing —
+# afterwards would shift the span offsets computed here.
+ENTITY_RE = re.compile(r"&[a-zA-Z]+;|&#\d+;")
+
 
 def parse_tajweed(marked):
     """Turn '<rule class=x>..</rule>' markup into (plain_text, spans).
     Spans are [start, end, rule] in code points of the plain text; nested
     rules emit inner spans first so renderers can give them precedence."""
+    marked = ENTITY_RE.sub("", marked)
     out, spans, stack, pos, last = [], [], [], 0, 0
     for m in TAG_RE.finditer(marked):
         head = marked[last : m.start()]
@@ -210,6 +216,9 @@ CREATE TABLE topics(id INTEGER PRIMARY KEY, name TEXT, arabic_name TEXT,
   parent_id INTEGER, thematic_parent_id INTEGER, ontology_parent_id INTEGER,
   description TEXT, wiki_link TEXT, ayahs TEXT, related_topics TEXT);
 CREATE TABLE surah_info(surah INTEGER PRIMARY KEY, name TEXT, text TEXT);
+CREATE TABLE mushaf_layout(
+  surah INTEGER, ayah INTEGER, page INTEGER, line_start INTEGER,
+  line_end INTEGER, PRIMARY KEY(surah, ayah)) WITHOUT ROWID;
 CREATE TABLE mushaf_page_text(
   page INTEGER, surah INTEGER, ayah INTEGER, glyphs TEXT,
   PRIMARY KEY(page, surah, ayah)) WITHOUT ROWID;
@@ -454,6 +463,20 @@ def build_core():
         con.execute("INSERT INTO surah_info VALUES(?,?,?)",
                     (v["surah_number"], v["surah_name"], v["text"]))
 
+    # Hafs Smart: text encoded as pre-composed private-use glyphs (each
+    # codepoint is one shaped cluster, so marks cannot detach), plus the
+    # 15-line mushaf layout — page and the line range every ayah occupies.
+    smart = json.loads((DATA / "hafs_smart_v8.json").read_text(encoding="utf-8"))
+    sid = len(AYAH_SCRIPTS_CORE) + 1
+    con.execute("INSERT INTO scripts VALUES(?,?,?,?)",
+                (sid, "hafs-smart", "ayah", "core"))
+    for r in smart:
+        con.execute("INSERT INTO ayah_text VALUES(?,?,?,?)",
+                    (sid, r["sura_no"], r["aya_no"], r["aya_text"]))
+        con.execute("INSERT INTO mushaf_layout VALUES(?,?,?,?,?)",
+                    (r["sura_no"], r["aya_no"], r["page"], r["line_start"],
+                     r["line_end"]))
+
     # Mushaf page text: QPC V4 word glyphs grouped per ayah, keyed by page.
     v4 = load("mushaf/qpc-v4.json")
     page_words = {}
@@ -644,9 +667,11 @@ def validate():
         ("surahs", q("SELECT count(*) FROM surahs"), 114),
         ("ayahs", q("SELECT count(*) FROM ayahs"), 6236),
         ("words", q("SELECT count(*) FROM words"), 83668),
-        ("core ayah scripts", q("SELECT count(*) FROM scripts"), len(AYAH_SCRIPTS_CORE)),
+        # +1 for hafs-smart, which is ingested separately from AYAH_SCRIPTS_CORE.
+        ("core ayah scripts", q("SELECT count(*) FROM scripts"),
+         len(AYAH_SCRIPTS_CORE) + 1),
         ("ayah_text rows", q("SELECT count(*) FROM ayah_text"),
-         6236 * len(AYAH_SCRIPTS_CORE)),
+         6236 * (len(AYAH_SCRIPTS_CORE) + 1)),
         ("tajweed ayahs", q("SELECT count(*) FROM tajweed_ayah"), 6236),
         ("roots", q("SELECT count(*) FROM roots"), 1642),
         ("word_roots", q("SELECT count(*) FROM word_roots"), None),
@@ -664,10 +689,21 @@ def validate():
            "OR text LIKE '%</rule%' OR text LIKE '%<%'"), 0),
         ("unparsed tajweed markup (word)",
          q("SELECT count(*) FROM words WHERE tajweed_text LIKE '%<%'"), 0),
+        ("hafs-smart ayahs", q("SELECT count(*) FROM ayah_text t JOIN scripts s "
+                              "ON s.id=t.script_id WHERE s.slug='hafs-smart'"), 6236),
+        ("mushaf layout rows", q("SELECT count(*) FROM mushaf_layout"), 6236),
+        ("mushaf layout pages",
+         q("SELECT count(DISTINCT page) FROM mushaf_layout"), 604),
+        ("mushaf layout lines stay within 1..15",
+         q("SELECT count(*) FROM mushaf_layout WHERE line_start < 1 "
+           "OR line_end > 15 OR line_end < line_start"), 0),
         ("mushaf page text rows",
          q("SELECT count(*) FROM mushaf_page_text"), 6236),
         ("mushaf pages covered",
          q("SELECT count(DISTINCT page) FROM mushaf_page_text"), 604),
+        ("tajweed text free of ASCII (entities, markup)",
+         q("SELECT count(*) FROM tajweed_ayah WHERE text GLOB '*[!-~]*' "
+           "AND text GLOB '*[A-Za-z&;<>]*'"), 0),
         ("grammar: words annotated",
          q("SELECT count(*) FROM word_grammar"), None),
         ("grammar: verb lemmas", q("SELECT count(*) FROM verb_lemmas"), None),
