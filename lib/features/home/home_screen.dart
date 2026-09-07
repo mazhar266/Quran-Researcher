@@ -7,6 +7,7 @@ import '../../data/prefs.dart';
 import '../../data/repo.dart';
 import '../../l10n/l10n.dart';
 import '../research/research_tab.dart';
+import 'divisions_tab.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
           ],
           bottom: TabBar(isScrollable: true, tabs: [
             Tab(text: context.l10n.tabSurahs),
-            Tab(text: context.l10n.tabJuz),
+            Tab(text: context.l10n.tabDivisions),
             Tab(text: context.l10n.tabBookmarks),
             Tab(text: context.l10n.tabResearch),
           ]),
@@ -49,7 +50,7 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
         body: const TabBarView(
-          children: [_SurahTab(), _JuzTab(), _BookmarksTab(), ResearchTab()],
+          children: [_SurahTab(), DivisionsTab(), _BookmarksTab(), ResearchTab()],
         ),
       ),
     );
@@ -79,33 +80,6 @@ class _SurahTab extends ConsumerWidget {
               style: const TextStyle(fontFamily: 'UthmanicHafs', fontSize: 20),
             ),
             onTap: () => context.push('/surah/${s.id}'),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _JuzTab extends ConsumerWidget {
-  const _JuzTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final juz = ref.watch(juzListProvider);
-    return juz.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Could not load juz list.\n$e')),
-      data: (list) => ListView.builder(
-        itemCount: list.length,
-        itemBuilder: (context, i) {
-          final j = list[i];
-          return ListTile(
-            leading: CircleAvatar(child: Text('${j.number}')),
-            title: Text(context.l10n.juzTitle(j.number)),
-            subtitle:
-                Text(context.l10n.juzStartsAt(j.firstVerseKey, j.versesCount)),
-            onTap: () =>
-                context.push('/surah/${j.firstSurah}?ayah=${j.firstAyah}'),
           );
         },
       ),

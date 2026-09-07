@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/repo.dart';
+import '../../data/sections_repo.dart';
+import '../../l10n/l10n.dart';
 import '../../mushaf/mushaf_providers.dart';
 
 /// 604-page mushaf view using the QPC V1 per-page fonts. Without QUL's
@@ -44,12 +46,25 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         ref.listen(pageFontProvider((page: p, mono: mono)), (_, _) {});
       }
     }
-    final juz =
-        ref.watch(pageAyahsProvider(_page)).value?.firstOrNull?.juz;
+    final first = ref.watch(pageAyahsProvider(_page)).value?.firstOrNull;
+    // A printed mushaf heads each page with its juz and hizb quarter, so show
+    // the same divisions rather than the juz alone.
+    final position = first == null
+        ? null
+        : ref.watch(ayahPositionProvider('${first.surah}:${first.ayah}')).value;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Page $_page${juz == null ? '' : ' · Juz $juz'}'),
+        title: Text([
+          context.l10n.pageTitle(_page),
+          if (position?.juz != null) context.l10n.juzTitle(position!.juz!),
+          if (position?.hizb != null)
+            [
+              context.l10n.hizbTitle(position!.hizb!),
+              if (position.rubQuarter != null && position.rubQuarter != 0)
+                _quarterLabel(position.rubQuarter!),
+            ].join(' '),
+        ].join(' · ')),
         actions: [
           IconButton(
             icon: const Icon(Icons.numbers),
@@ -89,6 +104,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
       ),
     );
   }
+
+  static String _quarterLabel(int q) =>
+      switch (q) { 1 => '¼', 2 => '½', 3 => '¾', _ => '' };
 
   void _turn(int delta) {
     final target = (_page + delta).clamp(1, mushafPageCount);

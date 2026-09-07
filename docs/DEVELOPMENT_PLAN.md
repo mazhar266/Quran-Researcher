@@ -485,3 +485,32 @@ Consequence: the id keys per-user storage, so the app looks at a new directory
 the extracted mushaf fonts simply regenerate; `shared_preferences.json`
 (bookmarks, last-read, settings) does not, so copy it across when changing the
 id. On Android the new id installs as a separate app — uninstall the old one.
+
+
+---
+
+## Addition — mushaf divisions surfaced (juz, hizb, rubʿ, rukuʿ, manzil, sajdah)
+
+Phase 0 stored juz, hizb, rubʿ, rukuʿ, manzil and sajdah on every ayah, but
+only juz and the sajdah icon were ever shown — hizb, rubʿ, rukuʿ and manzil had
+zero references in `lib/`. They are now used everywhere they belong:
+
+* **Reader stop markers** — the division that opens at an ayah is marked above
+  it, the way a printed mushaf marks its margin: juz and manzil emphasised,
+  hizb, rukuʿ, and the ۞ rubʿ quarters (¼, ½ — the nisf — and ¾). Suppressed in
+  Warsh, whose numbering the Hafs-keyed data does not match.
+* **Divisions browser** — the home tab formerly listing only juz now switches
+  between juz (30), hizb (60), rubʿ (240, labelled "¼ Hizb 3" as a mushaf does),
+  rukuʿ (558), manzil (7) and the 15 sajdah ayahs, marked obligatory or
+  recommended with their page number.
+* **Mushaf header** — page, juz and hizb quarter, instead of the juz alone.
+
+`sections_repo.dart` loads the ~694 boundary ayahs once and caches them, so
+the marker lookup is a map read rather than a query per ayah.
+
+Covered by six tests: the division counts (30/60/240/558/7), the classical
+start ayahs (juz 2 at 2:142, the seven manzils at 1:1, 5:1, 10:1, 17:1, 26:1,
+37:1, 50:1), four rubʿ to a hizb with the half-hizb quarter, boundary marking
+(including an ayah that opens a rukuʿ only, and mid-division ayahs marking
+nothing), the 15 sajdahs with 4 obligatory, and an ayah reporting every
+division it sits inside.

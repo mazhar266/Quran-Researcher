@@ -511,6 +511,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tip: in the reader, tap any word (word-by-word mode) for its morphology and dictionary entry, or use the research button on an ayah for similar ayahs, shared phrases, and themes.'**
   String get researchTip;
+
+  /// No description provided for @hizbTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb {number}'**
+  String hizbTitle(int number);
+
+  /// No description provided for @rukuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruku {number}'**
+  String rukuTitle(int number);
+
+  /// No description provided for @manzilTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manzil {number}'**
+  String manzilTitle(int number);
+
+  /// No description provided for @rubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rub {number}'**
+  String rubTitle(int number);
+
+  /// No description provided for @sectionJuz.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get sectionJuz;
+
+  /// No description provided for @sectionHizb.
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb'**
+  String get sectionHizb;
+
+  /// No description provided for @sectionRub.
+  ///
+  /// In en, this message translates to:
+  /// **'Rub\' al-Hizb'**
+  String get sectionRub;
+
+  /// No description provided for @sectionRuku.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruku'**
+  String get sectionRuku;
+
+  /// No description provided for @sectionManzil.
+  ///
+  /// In en, this message translates to:
+  /// **'Manzil'**
+  String get sectionManzil;
+
+  /// No description provided for @sectionSajdah.
+  ///
+  /// In en, this message translates to:
+  /// **'Sajdah'**
+  String get sectionSajdah;
+
+  /// No description provided for @sajdahObligatory.
+  ///
+  /// In en, this message translates to:
+  /// **'Obligatory'**
+  String get sajdahObligatory;
+
+  /// No description provided for @sajdahRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get sajdahRecommended;
+
+  /// No description provided for @tabDivisions.
+  ///
+  /// In en, this message translates to:
+  /// **'Divisions'**
+  String get tabDivisions;
+
+  /// No description provided for @pageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number}'**
+  String pageTitle(int number);
 }
 
 class _AppLocalizationsDelegate

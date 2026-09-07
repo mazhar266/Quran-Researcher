@@ -68,5 +68,54 @@
   "researchThemesSub": "প্রতিটি সূরার বিষয়ভিত্তিক অংশ",
   "researchTopics": "বিষয়সূচি (টপিক)",
   "researchTopicsSub": "২,৫১২টি বিষয় — বিবরণ, আয়াত ও আন্তঃসংযোগসহ",
-  "researchTip": "পরামর্শ: রিডারে (শব্দে-শব্দে মোডে) যেকোনো শব্দে চাপ দিলে তার গঠন ও অভিধান-ভুক্তি দেখা যায়, আর আয়াতের গবেষণা বোতামে সাদৃশ্যপূর্ণ আয়াত, অভিন্ন বাক্যাংশ ও বিষয়বস্তু পাওয়া যায়।"
+  "researchTip": "পরামর্শ: রিডারে (শব্দে-শব্দে মোডে) যেকোনো শব্দে চাপ দিলে তার গঠন ও অভিধান-ভুক্তি দেখা যায়, আর আয়াতের গবেষণা বোতামে সাদৃশ্যপূর্ণ আয়াত, অভিন্ন বাক্যাংশ ও বিষয়বস্তু পাওয়া যায়।",
+  "hizbTitle": "হিযব {number}",
+  "@hizbTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "rukuTitle": "রুকু {number}",
+  "@rukuTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "manzilTitle": "মানযিল {number}",
+  "@manzilTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "rubTitle": "রুব {number}",
+  "@rubTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionJuz": "পারা",
+  "sectionHizb": "হিযব",
+  "sectionRub": "রুবউল হিযব",
+  "sectionRuku": "রুকু",
+  "sectionManzil": "মানযিল",
+  "sectionSajdah": "সিজদাহ",
+  "sajdahObligatory": "ওয়াজিব",
+  "sajdahRecommended": "মুস্তাহাব",
+  "tabDivisions": "বিভাগ",
+  "pageTitle": "পৃষ্ঠা {number}",
+  "@pageTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }

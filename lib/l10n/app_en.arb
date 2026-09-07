@@ -8,15 +8,42 @@
   "searchTooltip": "Search",
   "settingsTooltip": "Settings",
   "continueReading": "Continue {verseKey}",
-  "@continueReading": {"placeholders": {"verseKey": {"type": "String"}}},
+  "@continueReading": {
+    "placeholders": {
+      "verseKey": {
+        "type": "String"
+      }
+    }
+  },
   "makkah": "Makkah",
   "madinah": "Madinah",
   "ayahsCount": "{count} ayahs",
-  "@ayahsCount": {"placeholders": {"count": {"type": "int"}}},
+  "@ayahsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "juzTitle": "Juz {number}",
-  "@juzTitle": {"placeholders": {"number": {"type": "int"}}},
+  "@juzTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "juzStartsAt": "Starts at {verseKey} · {count} ayahs",
-  "@juzStartsAt": {"placeholders": {"verseKey": {"type": "String"}, "count": {"type": "int"}}},
+  "@juzStartsAt": {
+    "placeholders": {
+      "verseKey": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noBookmarks": "No bookmarks yet — tap the bookmark icon on any ayah.",
   "searchHint": "Search Arabic, English, Bangla, transliteration…",
   "searchMinChars": "Type at least two characters to search.",
@@ -35,9 +62,21 @@
   "tajweedColorsSub": "Color recitation rules in the Uthmani/QPC Hafs scripts",
   "tajweedLegend": "Rule legend & toggles",
   "tajweedAllShown": "All {count} rules shown",
-  "@tajweedAllShown": {"placeholders": {"count": {"type": "int"}}},
+  "@tajweedAllShown": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "tajweedHidden": "{count} rules hidden",
-  "@tajweedHidden": {"placeholders": {"count": {"type": "int"}}},
+  "@tajweedHidden": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sectionDisplay": "Display",
   "wordByWord": "Word-by-word glosses",
   "wordByWordSub": "Show each word with its English and Bangla meaning",
@@ -66,7 +105,13 @@
   "setRangeA": "Set A",
   "setRangeB": "Set B",
   "ayahLabel": "Ayah {verseKey}",
-  "@ayahLabel": {"placeholders": {"verseKey": {"type": "String"}}},
+  "@ayahLabel": {
+    "placeholders": {
+      "verseKey": {
+        "type": "String"
+      }
+    }
+  },
   "researchRoots": "Root explorer",
   "researchRootsSub": "1,642 trilateral roots with corpus-wide occurrences and the Arramooz dictionary",
   "researchPhrases": "Mutashabihat",
@@ -75,5 +120,54 @@
   "researchThemesSub": "Thematic sections of every surah",
   "researchTopics": "Topic ontology",
   "researchTopicsSub": "2,512 topics with descriptions, ayahs, and cross-links",
-  "researchTip": "Tip: in the reader, tap any word (word-by-word mode) for its morphology and dictionary entry, or use the research button on an ayah for similar ayahs, shared phrases, and themes."
+  "researchTip": "Tip: in the reader, tap any word (word-by-word mode) for its morphology and dictionary entry, or use the research button on an ayah for similar ayahs, shared phrases, and themes.",
+  "hizbTitle": "Hizb {number}",
+  "@hizbTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "rukuTitle": "Ruku {number}",
+  "@rukuTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "manzilTitle": "Manzil {number}",
+  "@manzilTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "rubTitle": "Rub {number}",
+  "@rubTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionJuz": "Juz",
+  "sectionHizb": "Hizb",
+  "sectionRub": "Rub' al-Hizb",
+  "sectionRuku": "Ruku",
+  "sectionManzil": "Manzil",
+  "sectionSajdah": "Sajdah",
+  "sajdahObligatory": "Obligatory",
+  "sajdahRecommended": "Recommended",
+  "tabDivisions": "Divisions",
+  "pageTitle": "Page {number}",
+  "@pageTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }

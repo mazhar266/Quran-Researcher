@@ -16,6 +16,7 @@ import '../research/ayah_research_sheet.dart';
 import '../research/surah_info_sheet.dart';
 import '../research/word_sheet.dart';
 import 'player_bar.dart';
+import 'section_marker.dart';
 import 'tafsir_sheet.dart';
 import 'translation_text.dart';
 
@@ -112,6 +113,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final surahs = ref.watch(surahsProvider).value;
     final surah = surahs?.where((s) => s.id == widget.surahId).firstOrNull;
     final ayahs = ref.watch(surahAyahsProvider(widget.surahId));
+    // Warsh numbers its ayahs differently, so the Hafs-keyed division data
+    // would land on the wrong verses.
+    final isWarsh = ref.watch(settingsProvider.select((s) => s.isWarsh));
 
     return Scaffold(
       appBar: AppBar(
@@ -179,7 +183,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                 show: surah?.bismillahPre ?? widget.surahId != 1,
               );
             }
-            return AyahTile(ayah: list[i - 1]);
+            final ayah = list[i - 1];
+            // Mushaf stop markers (juz / hizb / rubʿ / rukuʿ / manzil) sit
+            // above the ayah that opens the division.
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!isWarsh) SectionMarker(verseKey: ayah.verseKey),
+                AyahTile(ayah: ayah),
+              ],
+            );
           },
         ),
       ),

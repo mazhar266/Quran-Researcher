@@ -234,4 +234,56 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get researchTip =>
       'পরামর্শ: রিডারে (শব্দে-শব্দে মোডে) যেকোনো শব্দে চাপ দিলে তার গঠন ও অভিধান-ভুক্তি দেখা যায়, আর আয়াতের গবেষণা বোতামে সাদৃশ্যপূর্ণ আয়াত, অভিন্ন বাক্যাংশ ও বিষয়বস্তু পাওয়া যায়।';
+
+  @override
+  String hizbTitle(int number) {
+    return 'হিযব $number';
+  }
+
+  @override
+  String rukuTitle(int number) {
+    return 'রুকু $number';
+  }
+
+  @override
+  String manzilTitle(int number) {
+    return 'মানযিল $number';
+  }
+
+  @override
+  String rubTitle(int number) {
+    return 'রুব $number';
+  }
+
+  @override
+  String get sectionJuz => 'পারা';
+
+  @override
+  String get sectionHizb => 'হিযব';
+
+  @override
+  String get sectionRub => 'রুবউল হিযব';
+
+  @override
+  String get sectionRuku => 'রুকু';
+
+  @override
+  String get sectionManzil => 'মানযিল';
+
+  @override
+  String get sectionSajdah => 'সিজদাহ';
+
+  @override
+  String get sajdahObligatory => 'ওয়াজিব';
+
+  @override
+  String get sajdahRecommended => 'মুস্তাহাব';
+
+  @override
+  String get tabDivisions => 'বিভাগ';
+
+  @override
+  String pageTitle(int number) {
+    return 'পৃষ্ঠা $number';
+  }
 }

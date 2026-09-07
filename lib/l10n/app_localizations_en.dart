@@ -236,4 +236,56 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get researchTip =>
       'Tip: in the reader, tap any word (word-by-word mode) for its morphology and dictionary entry, or use the research button on an ayah for similar ayahs, shared phrases, and themes.';
+
+  @override
+  String hizbTitle(int number) {
+    return 'Hizb $number';
+  }
+
+  @override
+  String rukuTitle(int number) {
+    return 'Ruku $number';
+  }
+
+  @override
+  String manzilTitle(int number) {
+    return 'Manzil $number';
+  }
+
+  @override
+  String rubTitle(int number) {
+    return 'Rub $number';
+  }
+
+  @override
+  String get sectionJuz => 'Juz';
+
+  @override
+  String get sectionHizb => 'Hizb';
+
+  @override
+  String get sectionRub => 'Rub\' al-Hizb';
+
+  @override
+  String get sectionRuku => 'Ruku';
+
+  @override
+  String get sectionManzil => 'Manzil';
+
+  @override
+  String get sectionSajdah => 'Sajdah';
+
+  @override
+  String get sajdahObligatory => 'Obligatory';
+
+  @override
+  String get sajdahRecommended => 'Recommended';
+
+  @override
+  String get tabDivisions => 'Divisions';
+
+  @override
+  String pageTitle(int number) {
+    return 'Page $number';
+  }
 }
