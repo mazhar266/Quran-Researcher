@@ -8,7 +8,7 @@ class AboutScreen extends StatelessWidget {
 
   /// The app's release version. Kept in step with `version:` in pubspec.yaml,
   /// which test/version_test.dart asserts.
-  static const version = '2.1.2';
+  static const version = '2.4.0';
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +83,35 @@ class AboutScreen extends StatelessWidget {
                 ],
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(context.l10n.developer.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        letterSpacing: 1.1,
+                        fontWeight: FontWeight.w700,
+                        color: scheme.primary,
+                      )),
+                  const SizedBox(height: 6),
+                  Text('Mazhar Ahmed',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  Text('(Mazhar ibn Nasir ibn Naim)',
+                      style: TextStyle(color: scheme.onSurfaceVariant)),
+                  const SizedBox(height: 6),
+                  Text('BA in Islamic Studies from IOU',
+                      style: const TextStyle(height: 1.4)),
+                  Text('Dawra-e-Hadith from Qawmi Madrasa, Bangladesh',
+                      style: const TextStyle(height: 1.4)),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           for (final s in sources) ...[

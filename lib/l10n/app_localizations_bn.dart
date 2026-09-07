@@ -286,4 +286,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String pageTitle(int number) {
     return 'পৃষ্ঠা $number';
   }
+
+  @override
+  String get developer => 'ডেভেলপার';
 }

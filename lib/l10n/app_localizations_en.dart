@@ -288,4 +288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String pageTitle(int number) {
     return 'Page $number';
   }
+
+  @override
+  String get developer => 'Developer';
 }
