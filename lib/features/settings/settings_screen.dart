@@ -22,20 +22,24 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.settingsTooltip)),
       body: ListView(
         children: [
-          _SectionHeader(context.l10n.sectionScript),
-          RadioGroup<String>(
-            groupValue: settings.scriptSlug,
-            onChanged: (v) => notifier.update((s) => s.copyWith(scriptSlug: v)),
-            child: Column(
-              children: [
-                for (final script in readerScripts)
-                  RadioListTile<String>(
-                    value: script.slug,
-                    title: Text(script.label),
-                  ),
-              ],
+          // With a single script there is nothing to choose between.
+          if (readerScripts.length > 1) ...[
+            _SectionHeader(context.l10n.sectionScript),
+            RadioGroup<String>(
+              groupValue: settings.scriptSlug,
+              onChanged: (v) =>
+                  notifier.update((s) => s.copyWith(scriptSlug: v)),
+              child: Column(
+                children: [
+                  for (final script in readerScripts)
+                    RadioListTile<String>(
+                      value: script.slug,
+                      title: Text(script.label),
+                    ),
+                ],
+              ),
             ),
-          ),
+          ],
           _SectionHeader(context.l10n.sectionFontSize),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

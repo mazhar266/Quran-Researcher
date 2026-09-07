@@ -1,12 +1,10 @@
 import 'package:flutter/gestures.dart' show TapGestureRecognizer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' show Variable;
 import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../audio/audio_controller.dart';
-import '../../data/db.dart';
 import '../../data/models.dart';
 import '../../data/prefs.dart';
 import '../../data/repo.dart';
@@ -26,34 +24,6 @@ final surahAyahsProvider = FutureProvider.family<List<AyahView>, int>((
   surah,
 ) async {
   final settings = ref.watch(settingsProvider);
-  if (settings.isWarsh) {
-    // Warsh is a different riwayah with its own ayah numbering — Arabic only,
-    // no Hafs-keyed translations/wbw/audio alignment.
-    final extra = await ref.watch(moduleDbProvider('scripts_extra.db').future);
-    final rows = await extra
-        .customSelect(
-          "SELECT t.ayah, t.text FROM ayah_text t "
-          "JOIN scripts s ON s.id = t.script_id "
-          "WHERE s.slug = 'warsh' AND t.surah = ?1 ORDER BY t.ayah",
-          variables: [Variable.withInt(surah)],
-        )
-        .get();
-    return [
-      for (final r in rows)
-        AyahView(
-          surah: surah,
-          ayah: r.read<int>('ayah'),
-          verseKey: '$surah:${r.read<int>('ayah')}',
-          arabic: r.read<String>('text'),
-          page: null,
-          juz: null,
-          sajdaType: null,
-          words: const [],
-          translations: const {},
-          transliteration: null,
-        ),
-    ];
-  }
   final repo = await ref.watch(repoProvider.future);
   return repo.surahAyahs(
     surah,
@@ -113,9 +83,6 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final surahs = ref.watch(surahsProvider).value;
     final surah = surahs?.where((s) => s.id == widget.surahId).firstOrNull;
     final ayahs = ref.watch(surahAyahsProvider(widget.surahId));
-    // Warsh numbers its ayahs differently, so the Hafs-keyed division data
-    // would land on the wrong verses.
-    final isWarsh = ref.watch(settingsProvider.select((s) => s.isWarsh));
 
     return Scaffold(
       appBar: AppBar(
@@ -189,7 +156,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (!isWarsh) SectionMarker(verseKey: ayah.verseKey),
+                SectionMarker(verseKey: ayah.verseKey),
                 AyahTile(ayah: ayah),
               ],
             );
@@ -208,17 +175,6 @@ class _BismillahHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    if (settings.isWarsh) {
-      return Container(
-        margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(context.l10n.warshNotice),
-      );
-    }
     if (!show) return const SizedBox(height: 8);
     final text = ref.watch(_bismillahProvider(settings.scriptSlug)).value;
     if (text == null) return const SizedBox(height: 8);
@@ -294,7 +250,6 @@ class AyahTile extends ConsumerWidget {
                 ),
               ],
               const Spacer(),
-              if (!settings.isWarsh)
                 IconButton(
                   icon: Icon(
                     Icons.play_circle_outline,
@@ -323,7 +278,6 @@ class AyahTile extends ConsumerWidget {
                 tooltip: context.l10n.tafsirTooltip,
                 onPressed: () => showTafsirSheet(context, ayah.verseKey),
               ),
-              if (!settings.isWarsh)
                 IconButton(
                   icon: const Icon(Icons.science_outlined),
                   tooltip: context.l10n.researchTooltip,
@@ -518,9 +472,7 @@ class _ArabicTextState extends State<_ArabicText> with _WordTapRecognizers {
             TextSpan(
               text: tokens[i],
               style: widget.activeWord == i + 1 ? highlight : style,
-              recognizer: settings.isWarsh
-                  ? null
-                  : recognizerFor(ayah.surah, ayah.ayah, i + 1),
+              recognizer: recognizerFor(ayah.surah, ayah.ayah, i + 1),
             ),
             if (i != tokens.length - 1) TextSpan(text: ' ', style: style),
           ],

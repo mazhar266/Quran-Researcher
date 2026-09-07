@@ -66,24 +66,38 @@ void main() {
     }
   });
 
-  test('the dropped IndoPak Nastaleeq script is no longer offered', () {
-    // Its text is encoded in a private-use area (U+F500…) that no font in the
-    // dataset covers, so it could only ever render as boxes.
-    expect(readerScripts.map((s) => s.slug), isNot(contains('indopak-nastaleeq')));
+  test('only the QPC Hafs script is offered, and only its font is shipped', () {
+    expect(readerScripts.map((s) => s.slug), ['qpc-hafs']);
+    // The dropped scripts' fonts must not linger in the bundle.
+    final shipped = Directory('assets/fonts')
+        .listSync()
+        .map((f) => f.path.split('/').last)
+        .toList();
+    expect(shipped, ['UthmanicHafs_V22.ttf']);
   });
 
-  test('saved settings naming a removed script fall back to a working one', () {
-    final s = Settings.fromJson({'script': 'indopak-nastaleeq'});
-    expect(readerScripts.map((x) => x.slug), contains(s.scriptSlug));
-    expect(s.scriptSlug, 'qpc-hafs');
-    // A still-valid choice is preserved untouched.
-    expect(Settings.fromJson({'script': 'warsh'}).scriptSlug, 'warsh');
+  test('settings naming any dropped script fall back to the one that ships',
+      () {
+    // Anyone already reading in a removed script is moved across rather than
+    // left with text the app has no font for.
+    for (final dropped in [
+      'indopak-nastaleeq',
+      'digital-khatt-indopak',
+      'hafs-smart',
+      'warsh',
+      'uthmani',
+    ]) {
+      final s = Settings.fromJson({'script': dropped});
+      expect(s.scriptSlug, 'qpc-hafs', reason: dropped);
+      expect(readerScripts.map((x) => x.slug), contains(s.scriptSlug));
+    }
+    // The surviving choice is preserved untouched.
+    expect(Settings.fromJson({'script': 'qpc-hafs'}).scriptSlug, 'qpc-hafs');
   });
 
   test('each script font covers the madd marks the text relies on', () {
     // U+0653 MADDAH ABOVE is the ~ over أُولَـٰٓئِكَ; U+0670 is the dagger alef.
-    for (final name in ['UthmanicHafs_V22.ttf', 'DigitalKhattIndoPak.otf',
-                        'uthmanic-warsh-v21.ttf']) {
+    for (final name in ['UthmanicHafs_V22.ttf']) {
       final cps = fontCodepoints(File('assets/fonts/$name'));
       expect(cps, contains(0x0653), reason: '$name lacks MADDAH ABOVE');
       expect(cps, contains(0x0670), reason: '$name lacks superscript alef');

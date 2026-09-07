@@ -9,21 +9,14 @@ import '../theme/app_theme.dart';
 final sharedPrefsProvider =
     Provider<SharedPreferences>((ref) => throw UnimplementedError());
 
-/// Reader scripts (slug -> font family, label). Warsh is a different riwayah
-/// with its own ayah numbering, so the reader shows it Arabic-only.
+/// The one Arabic script the reader offers. The others were dropped: the
+/// IndoPak Nastaleeq data needs a font nobody ships, and Warsh and Hafs Smart
+/// each render from an encoding the rest of the app's data is not keyed to.
+/// Kept as a list so adding a script back is a one-line change.
 const readerScripts = [
-  (slug: 'uthmani', family: 'UthmanicHafs', label: 'Uthmani'),
   (slug: 'qpc-hafs', family: 'UthmanicHafs', label: 'Uthmani (QPC Hafs)'),
-  (
-    slug: 'digital-khatt-indopak',
-    family: 'DigitalKhattIndoPak',
-    label: 'IndoPak (Digital Khatt)',
-  ),
-  // Each codepoint here is a pre-composed glyph, so marks can never detach
-  // from their letter however the text is split for colouring.
-  (slug: 'hafs-smart', family: 'HafsSmart', label: 'Hafs Smart (15-line)'),
-  (slug: 'warsh', family: 'UthmanicWarsh', label: "Warsh (qira'at)"),
 ];
+
 
 class Settings {
   final String scriptSlug;
@@ -60,8 +53,6 @@ class Settings {
 
   /// qpc-hafs already ends each ayah with its Arabic number glyph.
   bool get scriptHasAyahMarker => scriptSlug == 'qpc-hafs';
-
-  bool get isWarsh => scriptSlug == 'warsh';
 
   /// Tajweed markup is QPC-Hafs based, so coloring applies to Hafs scripts.
   bool get tajweedApplies => tajweedColors && fontFamily == 'UthmanicHafs';
@@ -107,9 +98,8 @@ class Settings {
         'lang': appLanguage,
       };
 
-  /// A script that is no longer offered — indopak-nastaleeq was dropped
-  /// because its private-use encoding has no font here — must not survive in
-  /// saved settings, or the reader would render tofu boxes.
+  /// A script that is no longer offered must not survive in saved settings,
+  /// or the reader would query text it has no font for and draw tofu boxes.
   static String _knownScript(String? slug) =>
       readerScripts.any((s) => s.slug == slug) ? slug! : 'qpc-hafs';
 

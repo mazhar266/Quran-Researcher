@@ -91,15 +91,6 @@ flutter:
     - family: UthmanicHafs
       fonts:
         - asset: assets/fonts/UthmanicHafs_V22.ttf
-    - family: DigitalKhattIndoPak
-      fonts:
-        - asset: assets/fonts/DigitalKhattIndoPak.otf
-    - family: HafsSmart
-      fonts:
-        - asset: assets/fonts/hafssmart.8.ttf
-    - family: UthmanicWarsh
-      fonts:
-        - asset: assets/fonts/uthmanic-warsh-v21.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

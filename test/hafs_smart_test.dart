@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_app/data/db.dart';
 import 'package:quran_app/data/prefs.dart';
 
-import 'script_font_test.dart' show fontCodepoints;
 
 void main() {
   late AppDatabase db;
@@ -39,23 +38,15 @@ void main() {
     expect(runes.every((r) => r >= 0xE000 && r <= 0xF8FF), isTrue);
   });
 
-  test('the shipped font draws every glyph the text uses', () async {
+  test('the text and layout stay in core.db though the script is not offered',
+      () async {
+    // The reader now offers QPC Hafs alone, but the smart text and its
+    // 15-line layout remain available for the mushaf work.
+    expect(readerScripts.map((s) => s.slug), isNot(contains('hafs-smart')));
     final rows = await db.customSelect(
-        "SELECT t.text FROM ayah_text t JOIN scripts s ON s.id = t.script_id "
-        "WHERE s.slug = 'hafs-smart'").get();
-    final needed = <int>{};
-    for (final r in rows) {
-      needed.addAll(r.read<String>('text').runes.where((c) => c >= 0xE000));
-    }
-    final covered = fontCodepoints(File('assets/fonts/hafssmart.8.ttf'));
-    expect(needed.length, greaterThan(2000));
-    expect(needed.difference(covered), isEmpty);
-  });
-
-  test('the script is offered in the reader with its own font', () {
-    final script = readerScripts.firstWhere((s) => s.slug == 'hafs-smart');
-    expect(script.family, 'HafsSmart');
-    expect(File('pubspec.yaml').readAsStringSync(), contains('hafssmart.8.ttf'));
+        "SELECT count(*) AS n FROM ayah_text t JOIN scripts s "
+        "ON s.id = t.script_id WHERE s.slug = 'hafs-smart'").get();
+    expect(rows.first.read<int>('n'), 6236);
   });
 
   group('15-line mushaf layout', () {
