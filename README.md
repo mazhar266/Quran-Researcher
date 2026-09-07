@@ -11,7 +11,7 @@ Bilingual by design: English and Bengali (বাংলা) — UI, translations,
 ### Read
 - **22 script variants** — Uthmani, QPC Hafs, IndoPak (Digital Khatt), Hafs Smart (15-line) and Warsh in the reader; Imlaei and more in the data
 - **Tajweed colors** — all 18 QPC rule classes, with a legend and per-rule toggles
-- **Mushaf page mode** — all 604 pages in the authentic KFGQPC V4 per-page fonts, with colour ayah markers on light backgrounds and theme-coloured text in dark mode, swiped right-to-left like a physical mushaf
+- **Mushaf page mode** — all 604 pages in the authentic KFGQPC V4 per-page fonts, set as a printed leaf (aged paper, gilt frame, ruled surah band, ornamented page number), swiped right-to-left like a physical mushaf, with the screen kept awake and a tap for full-screen
 - **Word-by-word** interlinear English + Bangla glosses, transliteration, footnoted Sahih International
 - **Warsh riwayah** as a script option (Arabic-only, with its own ayah numbering)
 - **Mushaf divisions** — browse and jump by juz, hizb, rubʿ al-hizb (¼ ½ ¾ stops), rukuʿ, manzil, or the 15 sajdah ayahs; the reader marks each stop where it falls, as a printed mushaf does
@@ -84,7 +84,7 @@ docs/         development plan (phase-by-phase record)
 ## Testing
 
 ```bash
-flutter test        # 78 tests, incl. end-to-end queries against the real DBs
+flutter test        # 79 tests, incl. end-to-end queries against the real DBs
 ```
 
 The database tests read `dist/`, so run the ETL once first. A golden test pins Arabic text rendering (tajweed colors + highlight).

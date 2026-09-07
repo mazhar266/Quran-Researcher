@@ -291,4 +291,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get developer => 'Developer';
+
+  @override
+  String get goToPage => 'Go to page';
+
+  @override
+  String get ayahsOnPage => 'Ayahs on this page';
+
+  @override
+  String get goToPageTitle => 'Go to page (1–604)';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get go => 'Go';
 }

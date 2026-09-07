@@ -602,3 +602,27 @@ Guarded by a corpus-wide invariant (no run in the entire mushaf begins with a
 combining mark, and colouring never alters the text), a check that 2:5's madd
 run carries its لام and its ٓ, and a golden rendered through the real text
 engine so the mark's loss would reappear as a visual diff.
+
+
+---
+
+## Mushaf mode — reads like a printed leaf
+
+* **The screen stays awake.** Reciting from the page means long stretches
+  without touching the device, so `wakelock_plus` holds the display on while
+  the view is open and releases it on the way out. On Android this is the
+  window's keep-screen-on flag, not a held wake lock, so nothing leaks if the
+  app is backgrounded.
+* **Paper.** `paper.dart` gives the leaf an aged-page ground with ink-dark
+  text and a gilt double rule around the text block, the surah name set in a
+  ruled band, the juz/hizb heading along the top, and the page number in
+  Arabic-Indic digits inside a small ornament at the foot. Dark and OLED
+  themes keep their own ground — a glowing page in a dark room helps nobody —
+  but take the same framing.
+* **Immersive.** Tapping the leaf (or pressing Escape) hides the app bar and
+  system bars so the page fills the screen; tapping again brings them back.
+  The leaf reclaims the app-bar space when the chrome is hidden.
+
+A golden pins the treatment, rendered with page 1's real face pulled out of
+the shipped font pack so it shows true mushaf text rather than fallback
+ornaments.

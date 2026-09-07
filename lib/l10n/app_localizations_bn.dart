@@ -289,4 +289,19 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get developer => 'ডেভেলপার';
+
+  @override
+  String get goToPage => 'পৃষ্ঠায় যান';
+
+  @override
+  String get ayahsOnPage => 'এই পৃষ্ঠার আয়াত';
+
+  @override
+  String get goToPageTitle => 'পৃষ্ঠা নম্বর (১–৬০৪)';
+
+  @override
+  String get cancel => 'বাতিল';
+
+  @override
+  String get go => 'যান';
 }

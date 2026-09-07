@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show LogicalKeyboardKey;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../data/repo.dart';
 import '../../data/sections_repo.dart';
 import '../../l10n/l10n.dart';
 import '../../mushaf/mushaf_providers.dart';
+import 'paper.dart';
 
 /// 604-page mushaf view using the QPC V1 per-page fonts. Without QUL's
 /// line-layout data the words flow justified per page (not line-identical to
@@ -24,17 +26,37 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   late final PageController _controller;
   late int _page;
 
+  /// Chrome hides so the leaf fills the screen; a tap brings it back.
+  bool _chrome = true;
+
   @override
   void initState() {
     super.initState();
     _page = widget.initialPage.clamp(1, mushafPageCount);
     _controller = PageController(initialPage: _page - 1);
+    // Reciting from the page means long stretches without touching the
+    // screen, so hold the display awake while this view is open.
+    WakelockPlus.enable().ignore();
+    _applyImmersive();
   }
 
   @override
   void dispose() {
+    WakelockPlus.disable().ignore();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _applyImmersive() {
+    SystemChrome.setEnabledSystemUIMode(
+      _chrome ? SystemUiMode.edgeToEdge : SystemUiMode.immersive,
+    );
+  }
+
+  void _toggleChrome() {
+    setState(() => _chrome = !_chrome);
+    _applyImmersive();
   }
 
   @override
@@ -53,51 +75,76 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         ? null
         : ref.watch(ayahPositionProvider('${first.surah}:${first.ayah}')).value;
 
+    final palette = PaperPalette.of(context);
+    final heading = [
+      if (position?.juz != null) context.l10n.juzTitle(position!.juz!),
+      if (position?.hizb != null)
+        [
+          context.l10n.hizbTitle(position!.hizb!),
+          if (position.rubQuarter != null && position.rubQuarter != 0)
+            _quarterLabel(position.rubQuarter!),
+        ].join(' '),
+    ].join(' · ');
+    final surahName = first == null
+        ? ''
+        : ref
+                .watch(surahsProvider)
+                .value
+                ?.where((s) => s.id == first.surah)
+                .firstOrNull
+                ?.nameSimple ??
+            '';
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text([
-          context.l10n.pageTitle(_page),
-          if (position?.juz != null) context.l10n.juzTitle(position!.juz!),
-          if (position?.hizb != null)
-            [
-              context.l10n.hizbTitle(position!.hizb!),
-              if (position.rubQuarter != null && position.rubQuarter != 0)
-                _quarterLabel(position.rubQuarter!),
-            ].join(' '),
-        ].join(' · ')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.numbers),
-            tooltip: 'Go to page',
-            onPressed: _askPage,
-          ),
-          IconButton(
-            icon: const Icon(Icons.list),
-            tooltip: 'Ayahs on this page',
-            onPressed: _showAyahList,
-          ),
-        ],
-      ),
-      // RTL so swiping like turning a physical mushaf page. Arrow keys and
+      backgroundColor: palette.paper.withValues(alpha: 0.35),
+      extendBodyBehindAppBar: true,
+      appBar: _chrome
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(context.l10n.pageTitle(_page)),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.numbers),
+                  tooltip: context.l10n.goToPage,
+                  onPressed: _askPage,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.list),
+                  tooltip: context.l10n.ayahsOnPage,
+                  onPressed: _showAyahList,
+                ),
+              ],
+            )
+          : null,
+      // RTL so swiping turns the leaf like a physical mushaf. Arrow keys and
       // PageUp/PageDown turn pages on desktop and web.
       body: CallbackShortcuts(
         bindings: {
-          const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-              _turn(1),
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _turn(1),
           const SingleActivator(LogicalKeyboardKey.pageDown): () => _turn(1),
-          const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-              _turn(-1),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () => _turn(-1),
           const SingleActivator(LogicalKeyboardKey.pageUp): () => _turn(-1),
+          const SingleActivator(LogicalKeyboardKey.escape): _toggleChrome,
         },
         child: Focus(
           autofocus: true,
-          child: Directionality(
-            textDirection: TextDirection.rtl,
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: mushafPageCount,
-              onPageChanged: (i) => setState(() => _page = i + 1),
-              itemBuilder: (context, i) => _MushafPage(page: i + 1),
+          child: GestureDetector(
+            onTap: _toggleChrome,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: mushafPageCount,
+                onPageChanged: (i) => setState(() => _page = i + 1),
+                itemBuilder: (context, i) => _MushafLeaf(
+                  page: i + 1,
+                  palette: palette,
+                  heading: i + 1 == _page ? heading : '',
+                  surahName: i + 1 == _page ? surahName : '',
+                  topInset: _chrome ? kToolbarHeight : 0,
+                ),
+              ),
             ),
           ),
         ),
@@ -164,10 +211,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   }
 }
 
-class _MushafPage extends ConsumerWidget {
-  const _MushafPage({required this.page});
+/// One leaf of the mushaf: the ruled frame, the heading, the text block and
+/// the page number in its ornament.
+class _MushafLeaf extends ConsumerWidget {
+  const _MushafLeaf({
+    required this.page,
+    required this.palette,
+    required this.heading,
+    required this.surahName,
+    required this.topInset,
+  });
 
   final int page;
+  final PaperPalette palette;
+  final String heading;
+  final String surahName;
+  final double topInset;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -175,7 +234,6 @@ class _MushafPage extends ConsumerWidget {
     final font = ref.watch(pageFontProvider((page: page, mono: mono)));
     final ayahs = ref.watch(pageAyahsProvider(page));
     final surahs = ref.watch(surahsProvider).value;
-    final scheme = Theme.of(context).colorScheme;
 
     if (font.isLoading || ayahs.isLoading) {
       return const Center(
@@ -232,17 +290,31 @@ class _MushafPage extends ConsumerWidget {
       }
       flushRun(fontSize);
 
-      return SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: scheme.outlineVariant),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: blocks,
+      return SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(14, topInset + 8, 14, 12),
+          child: PageFrame(
+            palette: palette,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (heading.isNotEmpty || surahName.isNotEmpty)
+                  PageHeading(
+                      palette: palette, start: surahName, end: heading),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: DefaultTextStyle.merge(
+                      style: TextStyle(color: palette.ink),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: blocks,
+                      ),
+                    ),
+                  ),
+                ),
+                PageNumberOrnament(palette: palette, page: page),
+              ],
+            ),
           ),
         ),
       );
@@ -265,22 +337,23 @@ class _SurahHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    // A mushaf sets each surah's name in a ruled band across the column.
+    final palette = PaperPalette.of(context);
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
             border: Border.symmetric(
-                horizontal: BorderSide(color: scheme.primary, width: 1.2)),
+                horizontal: BorderSide(color: palette.frame, width: 1.2)),
           ),
           child: Center(
             child: Text('سورة $nameArabic',
                 style: TextStyle(
                     fontFamily: 'UthmanicHafs',
                     fontSize: fontSize * 0.85,
-                    color: scheme.primary)),
+                    color: palette.accent)),
           ),
         ),
         if (showBismillah)

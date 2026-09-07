@@ -601,6 +601,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Developer'**
   String get developer;
+
+  /// No description provided for @goToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to page'**
+  String get goToPage;
+
+  /// No description provided for @ayahsOnPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayahs on this page'**
+  String get ayahsOnPage;
+
+  /// No description provided for @goToPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to page (1–604)'**
+  String get goToPageTitle;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @go.
+  ///
+  /// In en, this message translates to:
+  /// **'Go'**
+  String get go;
 }
 
 class _AppLocalizationsDelegate

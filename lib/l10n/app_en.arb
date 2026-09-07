@@ -170,5 +170,10 @@
       }
     }
   },
-  "developer": "Developer"
+  "developer": "Developer",
+  "goToPage": "Go to page",
+  "ayahsOnPage": "Ayahs on this page",
+  "goToPageTitle": "Go to page (1–604)",
+  "cancel": "Cancel",
+  "go": "Go"
 }
