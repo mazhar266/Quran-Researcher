@@ -1,9 +1,10 @@
 # A6 Quran PDFs for 6" e-readers
 
-Two books, both built from the app's own data and fonts:
+Three books, all built from the app's own data and fonts:
 
 - `quran-a6-tajweed.pdf` — continuous flow, six large lines a page (below)
 - `mushaf-a6-madinah.pdf` — the app's mushaf mode: the printed Madinah pages, line for line ([further down](#mushaf-a6-madinahpdf))
+- `mushaf-a6-madinah-complete.pdf` — the same mushaf with a cover, clickable indexes and marginal notes ([last](#mushaf-a6-madinah-completepdf))
 
 ## quran-a6-tajweed.pdf
 
@@ -68,8 +69,8 @@ The 604-page Madinah mushaf exactly as the app's mushaf view draws it — the
 QPC V4 page fonts, one calligraphic glyph per word with tajweed colour built
 in — but set **line for line as printed**, which the app itself does not do.
 
-    python3 pdf/build_mushaf_pdf.py            # ~75 s, 1206 leaves, 62 MB
-    python3 pdf/build_mushaf_pdf.py --pages 1-5 -o /tmp/preview.pdf
+    python3 pdf/build_mushaf_pdf.py --edition plain   # ~75 s, 1206 leaves, 62 MB
+    python3 pdf/build_mushaf_pdf.py --edition plain --pages 1-5 -o /tmp/preview.pdf
 
 Same requirements: Chrome and `pymupdf`.
 
@@ -116,3 +117,23 @@ spacing to fit.
 **62 MB** is about the floor for this book: the V4 outlines themselves weigh
 ~166 KB a page. It is well within what e-readers open, but over GitHub's 50 MB
 warning if it is committed.
+
+## mushaf-a6-madinah-complete.pdf
+
+The same mushaf, finished as a book. Built by the same script, whose default
+edition it is:
+
+    python3 pdf/build_mushaf_pdf.py            # ~80 s, 1215 leaves, 63 MB
+
+| | |
+|---|---|
+| Cover | original geometric design in `mushaf_front.py` — star border, sunburst medallion with pendants, the app's «القرآن الكريم» calligraphy — gold on deep green |
+| Indexes | surahs (number, name, Makki/Madani, ayat, page) over 6 leaves; juz (name, opening words, surah:ayah, page) over 2. Every row is a link to where it begins |
+| Margin | juz, hizb, ¼ ½ ¾ of the hizb, sajdah (15), manzil — beside the line where each begins, the sajdah beside its ayah's end |
+| Rukuʿ | all 558, South Asian style: ع in the margin with the rukuʿ's number in the surah above, its ayat beside, its number in the juz below — and a small ع over the closing ayah's marker |
+| Labels | `Cover`, `i`–`viii` for the indexes, then `12-1`, `12-2` as before |
+
+Quarter stars (۞), the sajdah sign (۩) and its overline were already drawn by
+the V4 glyphs in the right places; the notes add what a printed mushaf keeps in
+its margin. Notes sharing a line stack, and the column is nudged so no two ever
+overlap. The column costs the text ~6% of its width (glyphs ≈5.3 mm).
