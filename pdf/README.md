@@ -137,3 +137,23 @@ Quarter stars (۞), the sajdah sign (۩) and its overline were already drawn by
 the V4 glyphs in the right places; the notes add what a printed mushaf keeps in
 its margin. Notes sharing a line stack, and the column is nudged so no two ever
 overlap. The column costs the text ~6% of its width (glyphs ≈5.3 mm).
+
+### If an e-reader struggles with it
+
+A 1215-leaf book whose every leaf embeds ~45 KB of calligraphy outlines is a
+lot to ask of an e-ink reader — Kobo's PDF engine in particular. Two levers,
+in the order worth trying:
+
+    python3 pdf/build_mushaf_pdf.py --split juz   # + pdf/volumes/juz-01..30.pdf
+    python3 pdf/build_mushaf_pdf.py --mono        # black text, half the drawing
+
+`--split juz` writes one PDF a juz (~41 leaves, 2.0–2.4 MB) beside the whole
+book: same leaves, own outline and page labels, no cover or index. `--mono`
+drops the colour layers, which halves the drawing on every page (16 KB → 7 KB
+of content) — the file only shrinks 8%, because Chrome already subsets each
+leaf's font to what that leaf sets.
+
+The cover is deliberately flat colour. Its first version used a radial gradient
+with transparency, which becomes a soft-masked shading in the PDF — and page 1
+is what a reader rasterises when it builds a library thumbnail, so that is
+exactly the page not to make clever.

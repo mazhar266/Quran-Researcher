@@ -30,7 +30,7 @@ import struct
 import tempfile
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
 
@@ -65,6 +65,7 @@ class Edition:
     frame_right: float
     complete: bool                     # cover, indexes and marginal notes
     inset: float = 2.0                 # outer rule to text
+    mono: bool = False                 # black text: one glyph a word, no layers
 
     @property
     def text_left(self) -> float:
@@ -198,7 +199,7 @@ class PageFont:
     def advance_of(self, gid: int) -> int:
         return self.advances[min(gid, len(self.advances) - 1)]
 
-    def stacks(self, text: str) -> list[tuple[list[tuple[int, int]], float, float | None]]:
+    def stacks(self, text: str, mono: bool = False) -> list[tuple[list[tuple[int, int]], float, float | None]]:
         """Per glyph of `text`: its (layer glyph id, palette index) layers,
         the kerning added to its advance, and — only when a layer's own
         advance disagrees with the glyph's — the width its stack must keep,
@@ -212,7 +213,7 @@ class PageFont:
             extra[i + 1] += dx2
         out = []
         for g, dx in zip(gids, extra):
-            layers = self.layers.get(g, [(g, 0xFFFF)])
+            layers = [(g, 0xFFFF)] if mono else self.layers.get(g, [(g, 0xFFFF)])
             odd = any(self.advance_of(lg) != self.advance_of(g) for lg, _ in layers)
             out.append((layers, dx / self.em, self.advance_of(g) / self.em if odd else None))
         return out
@@ -547,7 +548,7 @@ def leaf_html(m: Mushaf, page: int, lines: dict[int, dict], nums: list[int],
                 # The ayah marker that closes a rukuʿ carries a small ʿayn.
                 mark = ed.complete and closes in m.ruku_ends
                 words.append(("<b class=\"rk\">" if mark else "<b>")
-                             + "".join(stack(*st) for st in font.stacks(w)) + "</b>")
+                             + "".join(stack(*st) for st in font.stacks(w, ed.mono)) + "</b>")
             rows.append(
                 f'<div class="ln txt" style="top:{y:.2f}mm;font-family:P{page};'
                 f'font-size:{size:.3f}mm;{style}">{"".join(words)}</div>')
@@ -742,14 +743,60 @@ def navigation(doc: pymupdf.Document, m: Mushaf, plan,
     return surah_at, {j: at for j, (at, _) in juz_at.items()}
 
 
+def write_volumes(doc: pymupdf.Document, m: Mushaf, plan, front_leaves: int,
+                  out_dir: Path) -> list[tuple[Path, int, int]]:
+    """One PDF a juz. A whole 1200-leaf book with 600 embedded fonts is more
+    than some e-readers will open; a juz is ~40 leaves and a couple of MB."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    first: dict[int, int] = {}
+    for i, (page, lines, nums) in enumerate(plan):
+        for n in nums:
+            first.setdefault(m.juz[lines[n]["ayah"]], front_leaves + i)
+    order = sorted(first)
+    written = []
+    for k, j in enumerate(order):
+        start = first[j]
+        end = first[order[k + 1]] if k + 1 < len(order) else doc.page_count - 1
+        vol = pymupdf.open()
+        vol.insert_pdf(doc, from_page=start, to_page=end)
+        toc, labels, seen = [[1, f"Juz {j}", 1]], [], set()
+        for offset, (page, lines, nums) in enumerate(plan[start - front_leaves:
+                                                          end - front_leaves + 1]):
+            for n in nums:
+                if lines[n]["kind"] == "head":
+                    meta = m.surahs[lines[n]["surah"]]
+                    toc.append([2, f"{lines[n]['surah']}. {meta['name']} · {meta['arabic']}",
+                                offset + 1])
+            if page not in seen:
+                seen.add(page)
+                labels.append(dict(startpage=offset, prefix=f"{page}-", style="D",
+                                   firstpagenum=1))
+        vol.set_toc(toc)
+        vol.set_page_labels(labels)
+        vol.set_metadata({"title": f"الجزء {j} — Juz {j} (A6 mushaf)",
+                          "author": "King Fahd Glorious Quran Printing Complex (text & fonts)",
+                          "creator": "pdf/build_mushaf_pdf.py"})
+        path = out_dir / f"juz-{j:02d}.pdf"
+        vol.save(path, garbage=1, deflate=True, use_objstms=1)
+        written.append((path, vol.page_count, path.stat().st_size))
+    return written
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--edition", choices=EDITIONS, default="complete")
+    ap.add_argument("--mono", action="store_true",
+                    help="black text instead of the tajweed colour layers: half the "
+                         "drawing per page, for readers that render slowly")
+    ap.add_argument("--split", choices=("juz",),
+                    help="also write one PDF a juz into pdf/volumes/")
     ap.add_argument("--pages", help="mushaf page range such as 1-5, for previews")
     ap.add_argument("-o", "--out", type=Path)
     args = ap.parse_args()
     ed = EDITIONS[args.edition]
+    if args.mono:
+        ed = replace(ed, mono=True, out=ed.out.with_name(ed.out.stem + "-mono.pdf"))
     out_path = args.out or ed.out
 
     pages = range(1, PAGES + 1)
@@ -808,7 +855,14 @@ def main() -> None:
         "creator": "pdf/build_mushaf_pdf.py",
     })
     doc.save(out_path, garbage=1, deflate=True, use_objstms=1)
-    print(f"{doc.page_count} leaves -> {out_path}")
+    print(f"{doc.page_count} leaves -> {out_path} "
+          f"({out_path.stat().st_size / 1e6:.1f} MB)")
+    if args.split:
+        vols = write_volumes(doc, m, plan, doc.page_count - len(plan),
+                             out_path.parent / "volumes")
+        print(f"{len(vols)} volumes -> {vols[0][0].parent}/ "
+              f"({sum(v[2] for v in vols) / 1e6:.1f} MB total, "
+              f"largest {max(v[2] for v in vols) / 1e6:.1f} MB)")
 
 
 if __name__ == "__main__":

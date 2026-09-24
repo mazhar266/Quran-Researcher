@@ -118,18 +118,12 @@ def band(x0: float, y0: float, x1: float, y1: float, step: float) -> str:
 # --- the cover ------------------------------------------------------------------
 def cover_html() -> str:
     cx, cy = TITLE_X, TITLE_Y
+    # Flat colour only: no gradient, no transparency. A soft mask on the first
+    # page is what stalls e-ink readers that rasterise page 1 on import.
     svg = f"""
 <svg class="art" viewBox="0 0 {PAGE_W} {PAGE_H}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="leather" cx="50%" cy="46%" r="75%">
-      <stop offset="0" stop-color="{GREEN}"/><stop offset="1" stop-color="{GREEN_DEEP}"/>
-    </radialGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="{GOLD_PALE}" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="{GOLD_PALE}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="{PAGE_W}" height="{PAGE_H}" fill="url(#leather)"/>
+  <rect width="{PAGE_W}" height="{PAGE_H}" fill="{GREEN_DEEP}"/>
+  <rect x="6.6" y="6.6" width="{PAGE_W - 13.2}" height="{PAGE_H - 13.2}" fill="{GREEN}"/>
   <g fill="none" stroke="{GOLD}">
     <rect x="3.6" y="3.6" width="{PAGE_W - 7.2}" height="{PAGE_H - 7.2}" stroke-width="0.7"/>
     <rect x="4.7" y="4.7" width="{PAGE_W - 9.4}" height="{PAGE_H - 9.4}" stroke-width="0.22"/>
@@ -141,8 +135,6 @@ def cover_html() -> str:
     {corner(12.4, 12.4, 1, 1, 13)}{corner(PAGE_W - 12.4, 12.4, -1, 1, 13)}
     {corner(12.4, PAGE_H - 12.4, 1, -1, 13)}{corner(PAGE_W - 12.4, PAGE_H - 12.4, -1, -1, 13)}
   </g>
-
-  <circle cx="{cx}" cy="{cy}" r="34" fill="url(#glow)"/>
   <g fill="none" stroke="{GOLD}" stroke-width="0.28">
     {pendant(cx, cy - 31.2, -1)}{pendant(cx, cy + 31.2, 1)}
     <polygon points="{star(cx, cy, 16, 31.2, 26.6)}" stroke-width="0.55"/>
@@ -246,7 +238,7 @@ def front_css() -> str:
 @font-face {{ font-family: Quran; src: url("{F_QURAN.as_uri()}"); }}
 .cover {{ background: {GREEN_DEEP}; }}
 .cover .art {{ position: absolute; inset: 0; width: {PAGE_W}mm; height: {PAGE_H}mm; }}
-.cover .fill-deep {{ fill: {GREEN_DEEP}; }}
+.cover .fill-deep {{ fill: {GREEN}; }}
 .cover .solid {{ fill: {GOLD}; stroke: none; }}
 /* The calligraphy's ink is off its advance box (measured: centred 0.686 em
    in and 0.487 em down at line-height 1), so it is placed by its ink centre. */
