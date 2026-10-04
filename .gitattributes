@@ -1,0 +1,5 @@
+pdf/mushaf-a6-madinah-complete-images.pdf filter=lfs diff=lfs merge=lfs -text
+pdf/mushaf-a6-madinah-complete-mono.pdf filter=lfs diff=lfs merge=lfs -text
+pdf/mushaf-a6-madinah-complete.pdf filter=lfs diff=lfs merge=lfs -text
+pdf/mushaf-a6-madinah.pdf filter=lfs diff=lfs merge=lfs -text
+pdf/quran-a6-tajweed.pdf filter=lfs diff=lfs merge=lfs -text

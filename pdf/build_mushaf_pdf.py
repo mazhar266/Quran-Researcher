@@ -643,15 +643,17 @@ html, body {{ margin: 0; padding: 0; background: #fff; }}
 /* The page number in its ornament at the foot of the leaf. */
 .folio {{
   position: absolute; left: {ed.text_left}mm; width: {ed.text_w}mm;
-  top: {TEXT_BOTTOM + 1.6}mm; text-align: center; line-height: 1;
+  top: {TEXT_BOTTOM + 1.2}mm; text-align: center; line-height: 1;
 }}
 .folio span, .n, .rn, .rc {{
   font-feature-settings: "calt" 0, "liga" 0, "rlig" 0, "ccmp" 0;
 }}
+/* The folio reads at arm's length: these digits carry little ink for their
+   em, so the pill is sized generously inside the 9.5 mm below the text. */
 .folio span {{
-  display: inline-block; padding: 0.5mm 3.2mm 0.9mm;
-  border: 0.2mm solid {GILT}b3; border-radius: 3mm;
-  font-family: Quran; font-size: 3.6mm; color: {ACCENT};
+  display: inline-block; padding: 0.4mm 3.6mm 1.0mm;
+  border: 0.22mm solid {GILT}b3; border-radius: 3.4mm;
+  font-family: Quran; font-size: 5.0mm; color: {ACCENT};
 }}
 
 /* Marginal notes: juz, hizb and quarters, sajdah, manzil, rukuʿ. */

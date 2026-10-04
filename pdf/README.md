@@ -153,7 +153,33 @@ drops the colour layers, which halves the drawing on every page (16 KB → 7 KB
 of content) — the file only shrinks 8%, because Chrome already subsets each
 leaf's font to what that leaf sets.
 
+The third lever is `rasterise.py`, below: an image a page leaves the reader
+nothing to do but blit a bitmap.
+
 The cover is deliberately flat colour. Its first version used a radial gradient
 with transparency, which becomes a soft-masked shading in the PDF — and page 1
 is what a reader rasterises when it builds a library thumbnail, so that is
 exactly the page not to make clever.
+
+## rasterise.py — image-only copies
+
+An image-only PDF has no fonts at all, which is the least a reader can be
+asked to do. Navigation survives: outline, page labels and the index links are
+carried across, since the pages keep their size. The text stops being
+selectable and the file grows a lot.
+
+    python3 pdf/rasterise.py pdf/mushaf-a6-madinah-complete.pdf    # ~3 min
+    python3 pdf/rasterise.py pdf/volumes/juz-01.pdf -o out.pdf --size 1800x2537
+
+| | |
+|---|---|
+| Default size | 1800 × 2537 px a page — A6 at ~435 dpi |
+| Encoding | indexed PNG, 64 colours, written by Pillow as Indexed/Flate |
+| Whole book | `mushaf-a6-madinah-complete-images.pdf`, 1215 pages, 200 MB |
+| Per juz | `volumes-images/juz-01..30.pdf`, 40–46 pages, 6.5–7.7 MB each |
+
+A leaf uses a few dozen colours — ink, the tajweed palette, the gilt rules and
+their anti-aliasing — so an indexed PNG holds the text crisply at ~155 KB a
+page, about a third of JPEG at this size and far better on thin strokes.
+Rendering goes through PyMuPDF and the page is written by Pillow: PyMuPDF's own
+`insert_image` expands the palette back to RGB and costs ~37% more.
