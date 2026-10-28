@@ -44,7 +44,7 @@ flutter pub get
 flutter run          # pick your device: Linux, Chrome, Android, ...
 ```
 
-Prebuilt databases ship in `assets/db/`, so a plain checkout builds and runs. First launch copies them to app storage (a few seconds, once).
+Prebuilt databases ship in `assets/db/` (core text + reciter timings, ~75 MB), so a plain checkout builds and runs. First launch copies them to app storage (a few seconds, once). The ten tafsirs, the Arramooz dictionary and the mushaf fontpack are **not bundled** — the app downloads them on demand from the Hikmah CDN (`lib/data/cdn_catalog.dart` holds the URLs, sizes and SHA-256 digests), so the store package stays small. In dev checkouts the optional files still sit in `assets/db/` and `assets/fontpack_v4.zip` so the ETL output can be re-uploaded to S3.
 
 **Linux audio** needs the system libmpv: `sudo apt install libmpv-dev` (the app runs fine without it — playback is disabled and tells you what to install).
 

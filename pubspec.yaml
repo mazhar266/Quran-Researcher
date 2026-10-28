@@ -51,6 +51,11 @@ dependencies:
   media_kit_libs_windows_audio: ^1.0.9
   flutter_widget_from_html_core: ^0.17.2
   archive: ^4.2.0
+  # On-demand content downloads from the Hikmah CDN (tafsirs, dictionary,
+  # mushaf fontpack). http works on every platform incl. web; crypto verifies
+  # downloads against the SHA-256 digests in cdn_catalog.dart.
+  http: ^1.2.2
+  crypto: ^3.0.6
   flutter_localizations:
     sdk: flutter
   intl: any
@@ -83,9 +88,14 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Only the always-needed modules ship in the app (~75 MB); the ten tafsirs,
+  # the Arramooz dictionary and the fontpack are downloaded on demand from the
+  # Hikmah CDN — see lib/data/cdn_catalog.dart. The files still live in
+  # assets/db/ in the repo so etl/build.py output can be re-uploaded to S3.
   assets:
-    - assets/db/
-    - assets/fontpack_v4.zip
+    - assets/db/core.db
+    - assets/db/audio_953.db
+    - assets/db/audio_957.db
     - assets/icon.png
 
   fonts:

@@ -175,5 +175,46 @@
   "ayahsOnPage": "Ayahs on this page",
   "goToPageTitle": "Go to page (1–604)",
   "cancel": "Cancel",
-  "go": "Go"
+  "go": "Go",
+  "downloadsTitle": "Content downloads",
+  "downloadsSubtitle": "Tafsir books, dictionary and mushaf fonts",
+  "downloadsGroupTafsirEn": "Tafsir — English",
+  "downloadsGroupTafsirBn": "Tafsir — বাংলা",
+  "downloadsGroupResearch": "Research",
+  "downloadsGroupMushaf": "Mushaf",
+  "dictModuleName": "Arramooz classical Arabic dictionary",
+  "fontsModuleName": "Mushaf page fonts (KFGQPC)",
+  "downloadAction": "Download",
+  "downloadCancel": "Cancel",
+  "downloadRetry": "Retry",
+  "downloadFailed": "Download failed",
+  "downloadedLabel": "Downloaded",
+  "downloadRemove": "Remove",
+  "downloadRemoveConfirmTitle": "Remove download?",
+  "downloadRemoveConfirmBody": "You can download it again any time.",
+  "downloadProgressOf": "{received} of {total}",
+  "@downloadProgressOf": {
+    "placeholders": {
+      "received": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "tafsirNeedsDownload": "Tafsir not downloaded",
+  "tafsirNeedsDownloadBody": "This tafsir book is not on your device yet. Download it once to read it any time, offline.",
+  "dictNeedsDownload": "Dictionary not downloaded",
+  "dictNeedsDownloadBody": "The Arramooz classical dictionary powers the word-research tools. Download it once to use them offline.",
+  "fontsNeedsDownload": "Mushaf fonts not downloaded",
+  "fontsNeedsDownloadBody": "Page mode is drawn with the KFGQPC page fonts — {size} to download, about 160 MB on your device. Download once for offline page mode.",
+  "@fontsNeedsDownloadBody": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadWebNote": "On the web app, each tafsir, the dictionary and the mushaf fonts load automatically the first time you open them — no downloads to manage."
 }

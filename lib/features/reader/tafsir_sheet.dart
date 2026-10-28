@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+import '../../data/cdn_catalog.dart';
 import '../../data/prefs.dart';
 import '../../data/tafsir_repo.dart';
+import '../../l10n/l10n.dart';
+import '../downloads/module_download_view.dart';
 
 void showTafsirSheet(BuildContext context, String verseKey) {
   showModalBottomSheet<void>(
@@ -84,7 +87,15 @@ class _TafsirContent extends ConsumerWidget {
                 ],
               ),
             ),
-            error: (e, _) => Center(child: Text('Could not load tafsir.\n$e')),
+            error: (e, _) => e is ModuleNotDownloadedException
+                ? Center(
+                    child: ModuleDownloadView(
+                      moduleId: 'tafsir:$bookSlug',
+                      title: context.l10n.tafsirNeedsDownload,
+                      body: context.l10n.tafsirNeedsDownloadBody,
+                    ),
+                  )
+                : Center(child: Text('Could not load tafsir.\n$e')),
             data: (t) {
               if (t == null) {
                 return const Center(

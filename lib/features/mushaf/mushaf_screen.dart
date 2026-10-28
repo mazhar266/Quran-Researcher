@@ -4,10 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../data/cdn_catalog.dart';
+import '../../data/cdn_fetch.dart' show formatModuleSize;
 import '../../data/repo.dart';
 import '../../data/sections_repo.dart';
 import '../../l10n/l10n.dart';
 import '../../mushaf/mushaf_providers.dart';
+import '../downloads/module_download_view.dart';
 import 'paper.dart';
 
 /// 604-page mushaf view using the QPC V1 per-page fonts. Without QUL's
@@ -249,6 +252,18 @@ class _MushafLeaf extends ConsumerWidget {
       );
     }
     if (font.hasError) {
+      if (font.error is ModuleNotDownloadedException) {
+        return Center(
+          child: SingleChildScrollView(
+            child: ModuleDownloadView(
+              moduleId: fontpackV4.id,
+              title: context.l10n.fontsNeedsDownload,
+              body: context.l10n.fontsNeedsDownloadBody(
+                  formatModuleSize(fontpackV4.sizeBytes)),
+            ),
+          ),
+        );
+      }
       return Center(child: Text('Could not load page font.\n${font.error}'));
     }
     if (ayahs.hasError) {

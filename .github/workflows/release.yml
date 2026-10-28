@@ -133,10 +133,18 @@ jobs:
         run: flutter build apk --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
       - name: Package
         run: cp build/app/outputs/flutter-apk/app-release.apk "quran-researcher-${GITHUB_REF_NAME}-android.apk"
+      # Play Store artifact: signed with the same release key when the
+      # keystore secrets are configured (debug-signed otherwise).
+      - name: Build AAB (Play Store)
+        run: flutter build appbundle --release --build-name="${GITHUB_REF_NAME#v}" --build-number=${{ github.run_number }}
+      - name: Package AAB
+        run: cp build/app/outputs/bundle/release/app-release.aab "quran-researcher-${GITHUB_REF_NAME}-android.aab"
       - uses: actions/upload-artifact@v4
         with:
           name: android
-          path: quran-researcher-*-android.apk
+          path: |
+            quran-researcher-*-android.apk
+            quran-researcher-*-android.aab
 
   macos:
     runs-on: macos-latest

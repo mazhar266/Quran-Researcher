@@ -631,6 +631,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go'**
   String get go;
+
+  /// No description provided for @downloadsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Content downloads'**
+  String get downloadsTitle;
+
+  /// No description provided for @downloadsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir books, dictionary and mushaf fonts'**
+  String get downloadsSubtitle;
+
+  /// No description provided for @downloadsGroupTafsirEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir — English'**
+  String get downloadsGroupTafsirEn;
+
+  /// No description provided for @downloadsGroupTafsirBn.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir — বাংলা'**
+  String get downloadsGroupTafsirBn;
+
+  /// No description provided for @downloadsGroupResearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Research'**
+  String get downloadsGroupResearch;
+
+  /// No description provided for @downloadsGroupMushaf.
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf'**
+  String get downloadsGroupMushaf;
+
+  /// No description provided for @dictModuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Arramooz classical Arabic dictionary'**
+  String get dictModuleName;
+
+  /// No description provided for @fontsModuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf page fonts (KFGQPC)'**
+  String get fontsModuleName;
+
+  /// No description provided for @downloadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get downloadAction;
+
+  /// No description provided for @downloadCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get downloadCancel;
+
+  /// No description provided for @downloadRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get downloadRetry;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get downloadFailed;
+
+  /// No description provided for @downloadedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get downloadedLabel;
+
+  /// No description provided for @downloadRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get downloadRemove;
+
+  /// No description provided for @downloadRemoveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove download?'**
+  String get downloadRemoveConfirmTitle;
+
+  /// No description provided for @downloadRemoveConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can download it again any time.'**
+  String get downloadRemoveConfirmBody;
+
+  /// No description provided for @downloadProgressOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{received} of {total}'**
+  String downloadProgressOf(String received, String total);
+
+  /// No description provided for @tafsirNeedsDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir not downloaded'**
+  String get tafsirNeedsDownload;
+
+  /// No description provided for @tafsirNeedsDownloadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This tafsir book is not on your device yet. Download it once to read it any time, offline.'**
+  String get tafsirNeedsDownloadBody;
+
+  /// No description provided for @dictNeedsDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionary not downloaded'**
+  String get dictNeedsDownload;
+
+  /// No description provided for @dictNeedsDownloadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Arramooz classical dictionary powers the word-research tools. Download it once to use them offline.'**
+  String get dictNeedsDownloadBody;
+
+  /// No description provided for @fontsNeedsDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf fonts not downloaded'**
+  String get fontsNeedsDownload;
+
+  /// No description provided for @fontsNeedsDownloadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Page mode is drawn with the KFGQPC page fonts — {size} to download, about 160 MB on your device. Download once for offline page mode.'**
+  String fontsNeedsDownloadBody(String size);
+
+  /// No description provided for @downloadWebNote.
+  ///
+  /// In en, this message translates to:
+  /// **'On the web app, each tafsir, the dictionary and the mushaf fonts load automatically the first time you open them — no downloads to manage.'**
+  String get downloadWebNote;
 }
 
 class _AppLocalizationsDelegate

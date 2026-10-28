@@ -1,17 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/services.dart' show ByteData, rootBundle;
+
+import '../data/cdn_catalog.dart';
+import '../data/cdn_fetch.dart';
 
 Archive? _archive;
 
-/// Web: no filesystem — fetch the zip asset once (browser-cached) and keep
-/// the decoded index in memory; individual page fonts decompress on demand.
+/// Web: no filesystem — fetch the fontpack zip from the CDN once (68 MB,
+/// browser-cached) and keep the decoded index in memory; individual page
+/// fonts decompress on demand.
 Future<ByteData> pageFontBytes(int page) async {
   if (_archive == null) {
-    final data = await rootBundle.load('assets/fontpack_v4.zip');
-    _archive = ZipDecoder().decodeBytes(Uint8List.view(
-        data.buffer, data.offsetInBytes, data.lengthInBytes));
+    final bytes = await fetchCdnModuleBytes(fontpackV4);
+    _archive = ZipDecoder().decodeBytes(bytes);
   }
   final file = _archive!.files.firstWhere(
     (f) => f.name == 'p$page.ttf',

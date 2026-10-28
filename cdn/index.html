@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="Content CDN of Hikmah Institute — on-demand data assets for Hikmah applications, including tafsir libraries, the classical Arabic dictionary, and mushaf page fonts for the Quran Researcher app.">
+<title>Hikmah Content CDN</title>
+<style>
+  :root {
+    --paper: #f7f4ed;
+    --paper-2: #efeee5;
+    --ink: #253a30;
+    --ink-soft: #263f32;
+    --sage: #647459;
+    --sage-pale: #dae1d5;
+    --gold: #c7b379;
+    --rust: #9c4a1d;
+    --muted: #62665e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.65 Georgia, "Times New Roman", serif;
+  }
+  .ar {
+    font-family: "Noto Naskh Arabic", "Traditional Arabic", serif;
+    direction: rtl;
+  }
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.4rem 1.25rem 2.1rem;
+    text-align: center;
+  }
+  header .ar {
+    display: block;
+    font-size: 2.1rem;
+    color: var(--gold);
+    line-height: 1.25;
+  }
+  header h1 {
+    font-size: 1.05rem;
+    font-weight: normal;
+    letter-spacing: .45em;
+    text-indent: .45em;
+    text-transform: uppercase;
+    margin: .5rem 0 .9rem;
+  }
+  header .motto {
+    font-size: .82rem;
+    font-style: italic;
+    color: var(--sage-pale);
+    letter-spacing: .06em;
+  }
+  header .motto .sep { color: var(--gold); font-style: normal; padding: 0 .35em; }
+  main { max-width: 54rem; margin: 0 auto; padding: 2.6rem 1.25rem 3.2rem; }
+  .star {
+    display: block;
+    margin: 0 auto 2.2rem;
+    color: var(--gold);
+  }
+  h2 {
+    font-size: 1.22rem;
+    margin: 2.4rem 0 .7rem;
+    color: var(--ink-soft);
+  }
+  h2:first-of-type { margin-top: 0; }
+  .lede { font-size: 1.08rem; }
+  .lede strong { color: var(--ink-soft); }
+  ol.how { padding-left: 1.2rem; }
+  ol.how li { margin: .35rem 0; }
+  a { color: var(--rust); }
+  footer {
+    background: var(--ink);
+    color: var(--sage-pale);
+    text-align: center;
+    padding: 1.6rem 1.25rem;
+    font-size: .85rem;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .fine { display: block; margin-top: .5rem; font-size: .74rem; color: var(--sage); }
+
+  @media (max-width: 640px) {
+    header { padding: 1.9rem 1rem 1.7rem; }
+    header .ar { font-size: 1.8rem; }
+    header h1 { font-size: .9rem; letter-spacing: .3em; text-indent: .3em; }
+    header .motto { font-size: .74rem; }
+    main { padding: 1.9rem 1rem 2.6rem; }
+    .star { margin-bottom: 1.6rem; }
+    .lede { font-size: 1rem; }
+    h2 { font-size: 1.12rem; margin: 1.9rem 0 .6rem; }
+    ol.how { padding-left: 1.05rem; font-size: .95rem; }
+  }
+  @media (max-width: 380px) {
+    header h1 { font-size: .82rem; letter-spacing: .22em; text-indent: .22em; }
+    header .motto { font-size: .68rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="ar" lang="ar">حكمة</span>
+  <h1>Hikmah Institute</h1>
+  <p class="motto">Knowledge <span class="sep">·</span> Worship <span class="sep">·</span> Service <span class="sep">·</span> Technology</p>
+</header>
+
+<main>
+  <svg class="star" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3">
+    <rect x="9" y="9" width="16" height="16"/>
+    <rect x="9" y="9" width="16" height="16" transform="rotate(45 17 17)"/>
+  </svg>
+
+  <h2 style="margin-top:0; font-size:1.5rem; text-align:center;">Content CDN</h2>
+  <p class="lede" style="text-align:center;">
+    This endpoint serves downloadable data assets for Hikmah applications.
+    It hosts the optional content modules of <strong>Quran Researcher</strong> —
+    tafsir libraries, a classical Arabic dictionary, and muṣḥaf page fonts —
+    delivered on demand when a user chooses to install them inside the app.
+  </p>
+
+  <h2>How it works</h2>
+  <ol class="how">
+    <li>Assets are addressed by <strong>versioned paths</strong>; older app releases keep working when new data is published.</li>
+    <li>Every download is <strong>verified</strong> against published sizes and SHA-256 digests before it is used.</li>
+    <li>These are <strong>plain static files</strong> — no accounts, no tracking, no analytics. The app downloads only what the user asks for.</li>
+  </ol>
+
+  <h2>About Hikmah</h2>
+  <p>
+    Hikmah is an educational initiative of Mazhar Ahmed — publications, research,
+    apps and learning tools. Learn more at
+    <a href="https://www.mazhar.fi/">mazhar.fi</a>.
+  </p>
+</main>
+
+<footer>
+  © 2026 Mazhar Ahmed · <a href="https://www.mazhar.fi/hikmah/">Hikmah</a>
+  <span class="fine">Learning with purpose. Sharing with care.</span>
+  <span class="fine">Hikmah is a nonprofit initiative in formation; a working name, not a statement of registration or accreditation.</span>
+</footer>
+
+</body>
+</html>

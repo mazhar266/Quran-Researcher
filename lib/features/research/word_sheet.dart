@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../data/cdn_catalog.dart';
 import '../../data/research_repo.dart';
+import '../../l10n/l10n.dart';
+import '../downloads/module_download_view.dart';
 import 'sarf_section.dart';
 import 'tajweed_section.dart';
 import 'widgets.dart';
@@ -135,10 +138,16 @@ class _DictSection extends ConsumerWidget {
         padding: EdgeInsets.all(24),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (e, _) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text('Dictionary unavailable.\n$e'),
-      ),
+      error: (e, _) => e is ModuleNotDownloadedException
+          ? ModuleDownloadView(
+              moduleId: dictAr.id,
+              title: context.l10n.dictNeedsDownload,
+              body: context.l10n.dictNeedsDownloadBody,
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('Dictionary unavailable.\n$e'),
+            ),
       data: (d) {
         if (d.nouns.isEmpty && d.verbs.isEmpty) {
           return const Padding(

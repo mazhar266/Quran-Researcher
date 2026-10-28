@@ -10,6 +10,11 @@ const mushafPageCount = 604;
 
 final _loadedFamilies = <String>{};
 
+/// Forget the families registered this session. Deleting the fontpack
+/// download must make the next page load fetch fonts again (FontLoader has
+/// no unregister, so re-registering after a re-download is the reset path).
+void resetMushafFonts() => _loadedFamilies.clear();
+
 /// Loads the per-page QPC V4 font and returns its family name.
 ///
 /// [mono] strips the font's colour tables so the glyphs take the theme's text

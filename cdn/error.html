@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="File not found — Hikmah Content CDN.">
+<title>Not found · Hikmah Content CDN</title>
+<style>
+  :root {
+    --paper: #f7f4ed;
+    --paper-2: #efeee5;
+    --ink: #253a30;
+    --ink-soft: #263f32;
+    --sage: #647459;
+    --sage-pale: #dae1d5;
+    --gold: #c7b379;
+    --rust: #9c4a1d;
+    --muted: #62665e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.65 Georgia, "Times New Roman", serif;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+  .ar {
+    font-family: "Noto Naskh Arabic", "Traditional Arabic", serif;
+    direction: rtl;
+  }
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1.7rem 1.25rem 1.5rem;
+    text-align: center;
+  }
+  header .ar {
+    display: block;
+    font-size: 1.8rem;
+    color: var(--gold);
+    line-height: 1.25;
+  }
+  header h1 {
+    font-size: .92rem;
+    font-weight: normal;
+    letter-spacing: .4em;
+    text-indent: .4em;
+    text-transform: uppercase;
+    margin: .4rem 0 0;
+  }
+  main {
+    flex: 1;
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 3.4rem;
+    text-align: center;
+  }
+  .star {
+    display: block;
+    margin: 0 auto 1.6rem;
+    color: var(--gold);
+  }
+  h2 { font-size: 1.6rem; margin: 0 0 .6rem; color: var(--ink-soft); }
+  .code {
+    color: var(--rust);
+    font-size: .95rem;
+    letter-spacing: .25em;
+    text-indent: .25em;
+    margin: 0 0 1.2rem;
+  }
+  p { color: var(--muted); }
+  ul {
+    text-align: left;
+    display: inline-block;
+    margin: 1rem auto 0;
+    padding-left: 1.1rem;
+    color: var(--muted);
+    font-size: .95rem;
+  }
+  .actions { margin: 2rem 0 0; }
+  .actions a {
+    display: inline-block;
+    margin: .35rem .5rem;
+    padding: .55rem 1.4rem;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+    font-size: .92rem;
+    letter-spacing: .04em;
+  }
+  .actions a:hover { background: var(--ink-soft); }
+  .actions a.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--sage);
+  }
+  .actions a.ghost:hover { border-color: var(--ink); }
+  footer {
+    background: var(--ink);
+    color: var(--sage-pale);
+    text-align: center;
+    padding: 1.2rem 1.25rem;
+    font-size: .85rem;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    header { padding: 1.4rem 1rem 1.2rem; }
+    header .ar { font-size: 1.5rem; }
+    header h1 { font-size: .8rem; letter-spacing: .3em; text-indent: .3em; }
+    main { padding: 2.2rem 1rem 2.8rem; }
+    .star { margin-bottom: 1.2rem; }
+    h2 { font-size: 1.3rem; }
+    .code { font-size: .85rem; letter-spacing: .18em; text-indent: .18em; }
+    ul { font-size: .9rem; }
+    .actions a {
+      display: block;
+      margin: .5rem auto;
+      max-width: 16rem;
+    }
+    .actions a.ghost { display: block; }
+  }
+  @media (max-width: 380px) {
+    header h1 { font-size: .74rem; letter-spacing: .22em; text-indent: .22em; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="ar" lang="ar">حكمة</span>
+  <h1>Hikmah Institute</h1>
+</header>
+
+<main>
+  <svg class="star" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3">
+    <rect x="9" y="9" width="16" height="16"/>
+    <rect x="9" y="9" width="16" height="16" transform="rotate(45 17 17)"/>
+    <line x1="17" y1="1" x2="17" y2="8"/>
+    <line x1="17" y1="26" x2="17" y2="33"/>
+    <line x1="1" y1="17" x2="8" y2="17"/>
+    <line x1="26" y1="17" x2="33" y2="17"/>
+  </svg>
+
+  <h2>File not found</h2>
+  <p class="code">404 · 403</p>
+  <p>
+    The file you requested does not exist on this CDN or is not publicly readable.
+  </p>
+  <ul>
+    <li>Assets are addressed by <strong>versioned paths</strong> — an old address may no longer be published.</li>
+    <li>If an app directed you here, updating the app usually resolves it.</li>
+    <li>Directory listing is not provided on this endpoint.</li>
+  </ul>
+
+  <div class="actions">
+    <a href="/">CDN home</a>
+    <a class="ghost" href="https://www.mazhar.fi/hikmah/">Hikmah website</a>
+  </div>
+</main>
+
+<footer>
+  © 2026 Mazhar Ahmed · <a href="https://www.mazhar.fi/hikmah/">Hikmah</a>
+</footer>
+
+</body>
+</html>

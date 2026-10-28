@@ -123,5 +123,46 @@
   "ayahsOnPage": "এই পৃষ্ঠার আয়াত",
   "goToPageTitle": "পৃষ্ঠা নম্বর (১–৬০৪)",
   "cancel": "বাতিল",
-  "go": "যান"
+  "go": "যান",
+  "downloadsTitle": "কনটেন্ট ডাউনলোড",
+  "downloadsSubtitle": "তাফসীর গ্রন্থ, অভিধান ও মুসহাফ ফন্ট",
+  "downloadsGroupTafsirEn": "তাফসীর — ইংরেজি",
+  "downloadsGroupTafsirBn": "তাফসীর — বাংলা",
+  "downloadsGroupResearch": "গবেষণা",
+  "downloadsGroupMushaf": "মুসহাফ",
+  "dictModuleName": "আররামূয আরবি অভিধান",
+  "fontsModuleName": "মুসহাফ পেজ ফন্ট (KFGQPC)",
+  "downloadAction": "ডাউনলোড",
+  "downloadCancel": "বাতিল",
+  "downloadRetry": "আবার চেষ্টা করুন",
+  "downloadFailed": "ডাউনলোড ব্যর্থ হয়েছে",
+  "downloadedLabel": "ডাউনলোড করা হয়েছে",
+  "downloadRemove": "মুছে ফেলুন",
+  "downloadRemoveConfirmTitle": "ডাউনলোড মুছে ফেলবেন?",
+  "downloadRemoveConfirmBody": "পরে যখন খুশি আবার ডাউনলোড করা যাবে।",
+  "downloadProgressOf": "{received} / {total}",
+  "@downloadProgressOf": {
+    "placeholders": {
+      "received": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "tafsirNeedsDownload": "তাফসীর ডাউনলোড হয়নি",
+  "tafsirNeedsDownloadBody": "এই তাফসীর গ্রন্থটি এখনো আপনার ডিভাইসে নেই। অফলাইনে যেকোনো সময় পড়ার জন্য একবার ডাউনলোড করুন।",
+  "dictNeedsDownload": "অভিধান ডাউনলোড হয়নি",
+  "dictNeedsDownloadBody": "শব্দ-গবেষণার টুলগুলোতে আররামূয আরবি অভিধান ব্যবহৃত হয়। অফলাইনে ব্যবহারের জন্য একবার ডাউনলোড করুন।",
+  "fontsNeedsDownload": "মুসহাফ ফন্ট ডাউনলোড হয়নি",
+  "fontsNeedsDownloadBody": "পেজ-মোড KFGQPC পেজ ফন্ট দিয়ে আঁকা হয় — ডাউনলোড {size}, ডিভাইসে প্রায় ১৬০ MB জায়গা লাগে। অফলাইন পেজ-মোডের জন্য একবার ডাউনলোড করুন।",
+  "@fontsNeedsDownloadBody": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadWebNote": "ওয়েব অ্যাপে প্রতিটি তাফসীর, অভিধান ও মুসহাফ ফন্ট প্রথমবার খুললেই নিজে থেকে লোড হয় — আলাদা ডাউনলোড ম্যানেজ করতে হয় না।"
 }

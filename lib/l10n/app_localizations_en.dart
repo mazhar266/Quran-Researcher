@@ -306,4 +306,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get go => 'Go';
+
+  @override
+  String get downloadsTitle => 'Content downloads';
+
+  @override
+  String get downloadsSubtitle => 'Tafsir books, dictionary and mushaf fonts';
+
+  @override
+  String get downloadsGroupTafsirEn => 'Tafsir — English';
+
+  @override
+  String get downloadsGroupTafsirBn => 'Tafsir — বাংলা';
+
+  @override
+  String get downloadsGroupResearch => 'Research';
+
+  @override
+  String get downloadsGroupMushaf => 'Mushaf';
+
+  @override
+  String get dictModuleName => 'Arramooz classical Arabic dictionary';
+
+  @override
+  String get fontsModuleName => 'Mushaf page fonts (KFGQPC)';
+
+  @override
+  String get downloadAction => 'Download';
+
+  @override
+  String get downloadCancel => 'Cancel';
+
+  @override
+  String get downloadRetry => 'Retry';
+
+  @override
+  String get downloadFailed => 'Download failed';
+
+  @override
+  String get downloadedLabel => 'Downloaded';
+
+  @override
+  String get downloadRemove => 'Remove';
+
+  @override
+  String get downloadRemoveConfirmTitle => 'Remove download?';
+
+  @override
+  String get downloadRemoveConfirmBody => 'You can download it again any time.';
+
+  @override
+  String downloadProgressOf(String received, String total) {
+    return '$received of $total';
+  }
+
+  @override
+  String get tafsirNeedsDownload => 'Tafsir not downloaded';
+
+  @override
+  String get tafsirNeedsDownloadBody =>
+      'This tafsir book is not on your device yet. Download it once to read it any time, offline.';
+
+  @override
+  String get dictNeedsDownload => 'Dictionary not downloaded';
+
+  @override
+  String get dictNeedsDownloadBody =>
+      'The Arramooz classical dictionary powers the word-research tools. Download it once to use them offline.';
+
+  @override
+  String get fontsNeedsDownload => 'Mushaf fonts not downloaded';
+
+  @override
+  String fontsNeedsDownloadBody(String size) {
+    return 'Page mode is drawn with the KFGQPC page fonts — $size to download, about 160 MB on your device. Download once for offline page mode.';
+  }
+
+  @override
+  String get downloadWebNote =>
+      'On the web app, each tafsir, the dictionary and the mushaf fonts load automatically the first time you open them — no downloads to manage.';
 }

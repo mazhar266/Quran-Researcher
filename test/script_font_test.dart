@@ -69,9 +69,10 @@ void main() {
   test('only the QPC Hafs script is offered, and only its font is shipped', () {
     expect(readerScripts.map((s) => s.slug), ['qpc-hafs']);
     // The dropped scripts' fonts must not linger in the bundle.
+    // (Split on both separators — Directory.listSync uses '\' on Windows.)
     final shipped = Directory('assets/fonts')
         .listSync()
-        .map((f) => f.path.split('/').last)
+        .map((f) => f.path.split(RegExp(r'[/\\]')).last)
         .toList();
     expect(shipped, ['UthmanicHafs_V22.ttf']);
   });

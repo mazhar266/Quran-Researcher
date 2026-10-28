@@ -135,6 +135,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           _SectionHeader(context.l10n.sectionAbout),
           ListTile(
+            leading: const Icon(Icons.cloud_download_outlined),
+            title: Text(context.l10n.downloadsTitle),
+            subtitle: Text(context.l10n.downloadsSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/downloads'),
+          ),
+          ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(context.l10n.aboutTitle),
             subtitle: Text(context.l10n.aboutSubtitle),

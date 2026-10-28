@@ -304,4 +304,83 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get go => 'যান';
+
+  @override
+  String get downloadsTitle => 'কনটেন্ট ডাউনলোড';
+
+  @override
+  String get downloadsSubtitle => 'তাফসীর গ্রন্থ, অভিধান ও মুসহাফ ফন্ট';
+
+  @override
+  String get downloadsGroupTafsirEn => 'তাফসীর — ইংরেজি';
+
+  @override
+  String get downloadsGroupTafsirBn => 'তাফসীর — বাংলা';
+
+  @override
+  String get downloadsGroupResearch => 'গবেষণা';
+
+  @override
+  String get downloadsGroupMushaf => 'মুসহাফ';
+
+  @override
+  String get dictModuleName => 'আররামূয আরবি অভিধান';
+
+  @override
+  String get fontsModuleName => 'মুসহাফ পেজ ফন্ট (KFGQPC)';
+
+  @override
+  String get downloadAction => 'ডাউনলোড';
+
+  @override
+  String get downloadCancel => 'বাতিল';
+
+  @override
+  String get downloadRetry => 'আবার চেষ্টা করুন';
+
+  @override
+  String get downloadFailed => 'ডাউনলোড ব্যর্থ হয়েছে';
+
+  @override
+  String get downloadedLabel => 'ডাউনলোড করা হয়েছে';
+
+  @override
+  String get downloadRemove => 'মুছে ফেলুন';
+
+  @override
+  String get downloadRemoveConfirmTitle => 'ডাউনলোড মুছে ফেলবেন?';
+
+  @override
+  String get downloadRemoveConfirmBody => 'পরে যখন খুশি আবার ডাউনলোড করা যাবে।';
+
+  @override
+  String downloadProgressOf(String received, String total) {
+    return '$received / $total';
+  }
+
+  @override
+  String get tafsirNeedsDownload => 'তাফসীর ডাউনলোড হয়নি';
+
+  @override
+  String get tafsirNeedsDownloadBody =>
+      'এই তাফসীর গ্রন্থটি এখনো আপনার ডিভাইসে নেই। অফলাইনে যেকোনো সময় পড়ার জন্য একবার ডাউনলোড করুন।';
+
+  @override
+  String get dictNeedsDownload => 'অভিধান ডাউনলোড হয়নি';
+
+  @override
+  String get dictNeedsDownloadBody =>
+      'শব্দ-গবেষণার টুলগুলোতে আররামূয আরবি অভিধান ব্যবহৃত হয়। অফলাইনে ব্যবহারের জন্য একবার ডাউনলোড করুন।';
+
+  @override
+  String get fontsNeedsDownload => 'মুসহাফ ফন্ট ডাউনলোড হয়নি';
+
+  @override
+  String fontsNeedsDownloadBody(String size) {
+    return 'পেজ-মোড KFGQPC পেজ ফন্ট দিয়ে আঁকা হয় — ডাউনলোড $size, ডিভাইসে প্রায় ১৬০ MB জায়গা লাগে। অফলাইন পেজ-মোডের জন্য একবার ডাউনলোড করুন।';
+  }
+
+  @override
+  String get downloadWebNote =>
+      'ওয়েব অ্যাপে প্রতিটি তাফসীর, অভিধান ও মুসহাফ ফন্ট প্রথমবার খুললেই নিজে থেকে লোড হয় — আলাদা ডাউনলোড ম্যানেজ করতে হয় না।';
 }
